@@ -3,7 +3,12 @@ function lerp(from, to, t)
 	return from + (to - from) * t
 end
 
-
+function all_true(arr, cond)
+    for e in all(arr) do
+        if (not cond(e)) return false
+    end
+    return true
+end
 
 function rndrange(low, high)
 	return low + rnd(high - low)
@@ -19,6 +24,14 @@ function drw_group(group)
     for e in all(group) do
         e:drw()
     end
+end
+
+function shuffle(tbl)
+  for i = #tbl, 2, -1 do
+    local j = flr(rnd(i) + 1)
+    tbl[i], tbl[j] = tbl[j], tbl[i]
+  end
+  return tbl
 end
 
 function split2d(s)

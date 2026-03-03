@@ -120,7 +120,9 @@ particle = game_object:extend({
     init = function(_𝘦𝘯𝘷)
         ox = x
         oy = y
+
         add(parts, _𝘦𝘯𝘷)
+        if pinit then pinit(_𝘦𝘯𝘷) end
     end,
     drw = function(_𝘦𝘯𝘷)
         if (wait) return
@@ -155,4 +157,28 @@ circlep = particle:extend({
     size = 1,
     border = false,
     pdrw = drw_circle
+})
+
+rectp = particle:extend({
+    iwidth = 2,
+    iheight = 1,
+    border = false,
+    pinit = function (_𝘦𝘯𝘷)
+        width = iwidth * size
+        height = iheight * size
+    end,
+    upd = function (_𝘦𝘯𝘷)
+        width = size * iwidth
+        height = size * iheight
+        dopart(_𝘦𝘯𝘷)
+    end,
+    drw = function (_𝘦𝘯𝘷)
+        local w, h = width / 2, height / 2
+        rectfill(x - w, y - h, x + w, y + h, c)
+        if border then
+            fillp(0xffff)
+            rect(x - w, y - h, x + w, y + h, c)
+            fillp(0x0)
+        end
+    end
 })

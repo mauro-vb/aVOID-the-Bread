@@ -1,16 +1,18 @@
 function end_init(_𝘦𝘯𝘷)
+
     pressed = false
     _upd = end_upd
     _drw = end_drw
     x = cam.x; y = cam.y
-    mapx, mapy = rndrange(0, 6), 0
 end
 
 function end_upd(_𝘦𝘯𝘷)
     if (pressed) return
+
     if btnp(❎) then
         pressed = true
-        scene:load(game)
+        transition({new_scene = game})
+        --scene:load(game)
     elseif btnp(🅾️) then
         pressed = true
         scene:load(ss)
@@ -18,7 +20,8 @@ function end_upd(_𝘦𝘯𝘷)
 end
 
 function end_drw(_𝘦𝘯𝘷)
-    map(mapx, mapy)
+    --
+    map()
     local strs = {"BAGELS", "BAGUETTES", "LOAVES", "OVENS"}
     for e=1,#strs do
         local tmp = strs[e]

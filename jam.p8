@@ -7,7 +7,7 @@ __lua__
 #include scripts/main.lua
 #include scripts/utils/utils.lua
 #include scripts/utils/sorty.lua
-
+#include scripts/utils/gfx_spriteshet.lua
 -- data
 #include data/myspr.txt
 
@@ -25,7 +25,6 @@ __lua__
 
 #include scripts/entities/oven.lua
 
-
 #include scripts/entities/camera.lua
 #include scripts/entities/player.lua
 
@@ -40,6 +39,8 @@ __lua__
 #include scripts/entities/game_ui.lua
 #include scripts/entities/upgrade_ui.lua
 #include scripts/scenes/transition.lua
+#include scripts/scenes/story.lua
+
 __gfx__
 ccccc000000cccccccccc00000ccccccccccc00000cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 cccc07676760cccccccc0676760ccccccccc0676760ccccccccc000000cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc

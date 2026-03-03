@@ -40,7 +40,7 @@ function chaintweens(steps, final_callback, pausable)
     local function chain()
         for step in all(steps) do
             -- wrap a single tween in a table so we can treat all steps uniformly
-            if not step[1] then
+            if type(step) == "function" or not step[1] then
                 step = { step }
             end
 

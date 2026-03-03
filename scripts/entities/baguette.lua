@@ -52,7 +52,7 @@ function baguette_ai(_𝘦𝘯𝘷)
         end
 
     else
-        if disto(_𝘦𝘯𝘷, p) < 64  and collides(_𝘦𝘯𝘷, cam) then
+        if disto(_𝘦𝘯𝘷, p) < 64  and collides(_𝘦𝘯𝘷, scene.cam) then
             timer = waitt + rnd(variationt)
             baguette_dash(_𝘦𝘯𝘷)
         else

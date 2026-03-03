@@ -2,19 +2,18 @@ function ss_init(_𝘦𝘯𝘷)
     pressed = false
     _upd = ss_upd
     _drw = ss_drw
-    if cam then
-        x, y = cam.x, cam.y
-    else
-        x, y = 64, 64
-    end
+    global.cam = nil
+    x, y = startpx, startpx - 64
     mapx, mapy = rndrange(0, 6), 0
+    camera(startpx - 64, startpy - 64)
 end
 
 function ss_upd(_𝘦𝘯𝘷)
     if (pressed) return
     if btnp(🅾️) or btnp(❎) then
         pressed = true
-        scene:load(game)
+        --scene:load(game)
+        transition({new_scene = story})
     end
 end
 
@@ -24,11 +23,6 @@ function ss_drw(_𝘦𝘯𝘷)
     print("\^o040PRESS ❎ / 🅾️", x - 28 , y , 15)
 end
 
-end_screen = scene:extend({
-    init = end_init,
-    upd = end_upd,
-    drw = end_drw,
-})
 ss = scene:extend({
     init = ss_init,
     upd = ss_upd,

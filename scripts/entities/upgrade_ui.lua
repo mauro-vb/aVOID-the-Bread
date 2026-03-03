@@ -2,7 +2,7 @@ upgrade_ui = game_object:extend({
     selected = 1,
     init = function(_𝘦𝘯𝘷)
         buttons = {}
-        x = cam.x; y = cam.y
+        x = scene.cam.x; y = scene.cam.y
         global.paused = true
         for part in all(parts) do
             del(parts, part)
@@ -43,8 +43,8 @@ upgrade_ui = game_object:extend({
     end,
     drw = function(_𝘦𝘯𝘷)
         drw_group(buttons)
-        rectfill(cam.x - 64, cam.y + 54, cam.x + 64, cam.y + 64, 7)
-        print(sbutt.upgrade.name, cam.x - 2 * #sbutt.upgrade.name, cam.y + 57, 0)
+        rectfill(x - 64, y + 54, x + 64, y + 64, 7)
+        print(sbutt.upgrade.name, x - 2 * #sbutt.upgrade.name, y + 57, 0)
     end
 })
 

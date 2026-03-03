@@ -84,6 +84,7 @@ end
 
 function player_move(_𝘦𝘯𝘷)
     if (dashing) return
+
     input_dir = 0
     if btn(⬅️) then input_dir += 1 end
     if btn(➡️) then input_dir += 2 end
@@ -190,8 +191,10 @@ function player_upd(_𝘦𝘯𝘷)
     player_hit_upd(_𝘦𝘯𝘷)
     player_anim(_𝘦𝘯𝘷, input_dir)
     player_upd_xp(_𝘦𝘯𝘷)
-    if hp <= 0 then global.scene:load(end_screen) end
-    hp = mid(0, hp, maxhp)
+
+    --if hp <= 0 then global.paused = true; transition({new_scene = end_screen}) end
+
+    hp = min(hp, maxhp)
 
     lastdir = input_dir
 end
@@ -222,7 +225,7 @@ end
 
 
 player = game_object:extend({
-    mv_spd = 1,
+    mv_spd = .8,
     dx = 0,
     dy = 0,
     sizex = 6,
@@ -291,7 +294,7 @@ player = game_object:extend({
     level = 1,
     level_ups = {1, 2, 3, 3, 3, 5, 10, 10, 10, 10, 20, 20, 30, 50, 100, 200, 500, 1000},
 
-
+    dustt = 60,
 
     upd = player_upd,
     drw = player_drw,

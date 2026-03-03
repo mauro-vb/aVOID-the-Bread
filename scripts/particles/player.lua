@@ -142,3 +142,24 @@ function enhit(_𝘦𝘯𝘷)
         })
     end
 end
+
+-- function dust(_𝘦𝘯𝘷)
+--     n = rndrange(2, 4)
+--     local y = y + 5
+--     for i = 1, n do
+--         rectp({
+--             iwidth = rndrange(0.1, 0.3),
+--             iheight = rndrange(0.1, 0.3),
+--             size = 7,
+--             c = rnd(split "6, 6, 14, 8"),
+--             x = x + rndrange(-2, 2),
+--             y = y + rndrange(-1, 2),
+--             sx = rndrange(-.2, .2),
+--             sy = rndrange(-.1, -.05),
+--             wait = rndrange(0, 4),
+--             maxage = rndrange(3, 7),
+--             onend = "fade",
+--             othergroup = entities
+--         })
+--     end
+-- end
