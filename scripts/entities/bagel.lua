@@ -14,6 +14,9 @@ function bagel_ai(_𝘦𝘯𝘷)
     end
    -- rotation_timer += 1
     last_pdist = pdist
+    if x >= maplims.maxx or x <= 0 or y >= maplims.maxy or y <= 0 then
+        rotation_dir *= -1
+    end
 end
 
 function bagel_drw(_𝘦𝘯𝘷)

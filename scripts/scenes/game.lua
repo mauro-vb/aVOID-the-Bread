@@ -44,7 +44,8 @@ end
 
 function end_game(_𝘦𝘯𝘷)
     over = true
-    transition({ new_scene = end_screen })
+    transition({ new_scene = end_screen, ox = cam.x - 64, oy = cam.y - 64 })
+    --startpx, startpy = cam.x, cam.y
 	--global.scene:load(end_screen)
 	--global.p = {x = p.x, y = p.y }
 	--global.cam = nil
@@ -57,7 +58,7 @@ function game_init(_𝘦𝘯𝘷)
 
     global.encount = { BAGELS = 0, BAGUETTES = 0, LOAVES = 0, OVENS = 0 }
     global.entities = {}
-    global.p = player({ x = startpx, y = startpy })
+    global.p = player({ x = startpx, y = startpy, hp = 1 })
     global.parts = {}
     global.ui = game_ui()
 
@@ -91,7 +92,6 @@ function game_drw(_𝘦𝘯𝘷)
     drw_group(attacks)
     if (over) return
     drw_group(parts)
-
     ui:drw()
 end
 

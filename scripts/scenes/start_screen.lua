@@ -1,9 +1,10 @@
 function ss_init(_𝘦𝘯𝘷)
+    global.cam = nil
     pressed = false
     _upd = ss_upd
     _drw = ss_drw
     global.cam = nil
-    x, y = startpx, startpx - 64
+    x, y = startpx, startpy
     mapx, mapy = rndrange(0, 6), 0
     camera(startpx - 64, startpy - 64)
 end
@@ -13,7 +14,7 @@ function ss_upd(_𝘦𝘯𝘷)
     if btnp(🅾️) or btnp(❎) then
         pressed = true
         --scene:load(game)
-        transition({new_scene = story})
+        transition({new_scene = story })
     end
 end
 

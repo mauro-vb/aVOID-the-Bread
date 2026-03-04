@@ -1,9 +1,9 @@
 function end_init(_𝘦𝘯𝘷)
-
     pressed = false
     _upd = end_upd
     _drw = end_drw
-    x = cam.x; y = cam.y
+    x = cam.x
+    y = cam.y
 end
 
 function end_upd(_𝘦𝘯𝘷)
@@ -11,11 +11,11 @@ function end_upd(_𝘦𝘯𝘷)
 
     if btnp(❎) then
         pressed = true
-        transition({new_scene = game})
-        --scene:load(game)
+        transition({new_scene = game })
     elseif btnp(🅾️) then
         pressed = true
-        scene:load(ss)
+        transition({new_scene = ss })
+
     end
 end
 

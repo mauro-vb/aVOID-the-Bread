@@ -8,13 +8,11 @@ transition = game_object:extend({
     shrink = false,
     trans = smootherstep,
     init = function(_𝘦𝘯𝘷)
-        local ox, oy = startpx - 64, startpy - 64
         circles = {}
         global.trans = _𝘦𝘯𝘷
-        if cam then ox, oy = cam.x + ox, cam.y + oy end
         for i = 1, n do
             for j = 1, n do
-                local circle = { x = ox + (i - 1) * 128 / (n - 1), y = oy + (j - 1) * 128 / (n - 1), r = 0, c = rnd(cols) }
+                local circle = { x = (i - 1) * 128 / (n - 1), y = (j - 1) * 128 / (n - 1), r = 0, c = rnd(cols) }
                 add(circles, circle)
                 local wait = rnd(15)
                 chaintweens({
@@ -35,10 +33,12 @@ transition = game_object:extend({
     drw = function(_𝘦𝘯𝘷)
         for circle in all(circles) do
             local r = circle.r
+            local x = peek2(0x5f28) + circle.x
+            local y = peek2(0x5f2a) + circle.y
             if r > 2 then
-                circfill(circle.x, circle.y, r + 1, 2)
+                circfill(x, y, r + 1, 2)
             end
-            circfill(circle.x, circle.y, r, circle.c)
+            circfill(x, y, r, circle.c)
         end
     end
 })
