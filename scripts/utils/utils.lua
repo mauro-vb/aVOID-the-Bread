@@ -16,13 +16,17 @@ end
 
 function upd_group(group)
     for e in all(group) do
-        e:upd()
+        if e.upd then
+            e:upd()
+        end
     end
 end
 
 function drw_group(group)
     for e in all(group) do
-        e:drw()
+        if e.drw then
+            e:drw()
+        end
     end
 end
 
@@ -47,7 +51,7 @@ function chance(proba)
     return rnd() < proba
 end
 
-local function contains(t, val)
+function contains(t, val)
     for v in all(t) do
         if v == val then
             return true
@@ -59,10 +63,10 @@ end
 
 -- movement
 function disto(_𝘦𝘯𝘷, t)
-	local diffx = x - t.x
-	local diffy = y - t.y
+	local diffx = (x - t.x) / 16
+	local diffy = (y - t.y) / 16
 	local res= diffx * diffx + diffy * diffy
-	return sqrt(res)
+	return sqrt(res) * 16
 end
 
 amap = split" 2,7,4,8,1,5,3,6"
@@ -92,13 +96,15 @@ function setdir(_𝘦𝘯𝘷, target)
     dy = ddy / distance
 end
 
-function setcardinaldir(_𝘦𝘯𝘷, p)
+function setcardinaldir(_𝘦𝘯𝘷, p, nofix)
 	ang = atan2(p.x - x, y - p.y)
 	local si = flr((ang * 8+ .5) % 8) + 1
 	local dir = amap[si]
 	dx = dirx[dir]
 	dy = diry[dir]
-	cobblefix(_𝘦𝘯𝘷, dir)
+	if not nofix then
+	    cobblefix(_𝘦𝘯𝘷, dir)
+	end
 	lastdir = dir
 end
 

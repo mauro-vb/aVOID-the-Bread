@@ -1,7 +1,0 @@
---- 1: hp   2: dmg
--- 1 player
--- 2 bagel
--- 3 baguette
--- 4 loaf
---
-stats_data=split2d"10,1|2,1|3,2|4,1"

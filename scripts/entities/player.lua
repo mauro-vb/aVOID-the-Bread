@@ -12,7 +12,7 @@ function player_dash(_𝘦𝘯𝘷)
         end
         local dashx, dashy = dx * dashforce, dy * dashforce
 
-        local dashf = 15
+        local dashf = 10
         dotween(_𝘦𝘯𝘷, "x", x + dashx, dashf, trans)
         dotween(_𝘦𝘯𝘷, "y", y + dashy, dashf, trans, function() dashing = false; dasht = dash_cd end)
     else
@@ -83,6 +83,7 @@ function player_hit_upd(_𝘦𝘯𝘷)
 end
 
 function player_move(_𝘦𝘯𝘷)
+
     if (dashing) return
 
     input_dir = 0
@@ -95,6 +96,14 @@ function player_move(_𝘦𝘯𝘷)
     cobblefix(_𝘦𝘯𝘷, input_dir)
     local nx, ny = x + dx * mv_spd, y + dy * mv_spd
     x = nx; y = ny
+    if input_dir != 0 then
+		if step_timer > 0 then
+	 	    step_timer -= 1
+		else
+		    sfx(age % 2 == 0 and 37 or 38)
+		    step_timer=20
+		end
+	 end
     player_dash(_𝘦𝘯𝘷)
     restric_movement(_𝘦𝘯𝘷)
 end
@@ -152,18 +161,14 @@ function player_level_up(_𝘦𝘯𝘷)
         local upg_type
 
         repeat
-            upg_type = rnd(upgrades)
-            if not upg_type then
-                return nil
-            end
-
-            new_upg = rnd(upg_type)
-
-
+           -- upg_type = rnd(upgrades)
+           -- if not upg_type or upg_type.repeatable then
+           --     return nil
+           -- end
+            new_upg = rnd(upgrades)
         until new_upg
-           and (not new_upg.valid or new_upg:valid())
-           and not contains(prev_upgs, new_upg)
-
+                   and new_upg:valid()
+                   and not contains(prev_upgs, new_upg)
         return new_upg
     end
 
@@ -218,7 +223,6 @@ function player_init(_𝘦𝘯𝘷)
     anim = anims.d_idle
     hit_t = hit_cd
     hit_wait_t = hit_wait
-    upgrades = {hit_upgrades, dash_upgrades, hp_upgrades}
     add(entities, _𝘦𝘯𝘷)
 end
 
@@ -253,12 +257,22 @@ player = game_object:extend({
     dasht = 0,
     has_dash = false,
     can_dash = false,
-    dashforce = 35,
-    dash_upgrades = {
+    dashforce = 28,
+    upgrades = {
                 {trigger = function() p.has_dash = true end, valid = function() return not p.has_dash end, name = "get a dash ❎", icon = myspr[51]},
                 {trigger = function() p.dash_cd -= 50 end, valid = function() return p.has_dash and p.dash_cd > 80 end, name = "reduce dash cooldown", icon = myspr[51]},
+                {trigger = function() p.hit_cd = mid(5, p.hit_cd - 20, 100) end, valid = function() return p.hit_cd > 10 end, name = "reduce hit cooldown", icon = myspr[50]},
+                {trigger = function() p.hitlen = mid(25, p.hitlen * 1.5, 60) ;  p.hitwid = mid(15, p.hitwid * 1.5, 35) end, valid = function() return p.hitlen < 60 end, name = "increase reach", icon = myspr[52]},
+                {trigger = function() p.hit_dmg += 5 end, valid = function() return true end, name = "increase damage", icon = myspr[49]},
+                {trigger = function() p.xp_received *= 1.5 end, valid = function() return p.xp_received < 100 and p.level > 10 end, name = "receive more xp", icon = myspr[49], repeatable = true},
+                {trigger = function() p.hp = mid(1, p.hp + .35 * p.maxhp, p.maxhp) end, valid = function() return p.hp != p.maxhp end, name = "heal", icon = myspr[53]},
+                {trigger = function() p.maxhp *= 1.2 end, valid = function() return true end, name = "increase max hp", icon = myspr[53]}, repeatable = true,
+                {trigger = function() p.lifesteal = true end, valid = function() return not p.lifesteal and p.level > 10 end, name = "lifesteal", icon = myspr[52]},
+                {trigger = function() p.dmg_received *= .75 end, valid = function() return p.dmg_received > .3 end, name = "reduce received damage", icon = myspr[48]},
+                {trigger = function() p.paralize = true end, valid = function() return not p.paralize end, name = "stun hit enemies", icon = myspr[52]},
+                {trigger = function() p.paralize_t = mid(1, p.paralize_t + 30, 120) end, valid = function() return p.paralize and p.paralize_t < 120 end, name = "longer stun", icon = myspr[50]},
     },
-
+    step_timer=20,
     hit_cd = 100,
     hitting = false,
     hit_wait = 10,
@@ -266,36 +280,16 @@ player = game_object:extend({
     hitwid = 12, -- min 15, max 30
     hit_dmg = 7, -- min 10, max 50
     hit = player_hit,
-    hit_upgrades = {
-            {trigger = function() p.hit_cd = mid(5, p.hit_cd - 30, 100) end, valid = function() return p.hit_cd > 10 end, name = "reduce hit cooldown", icon = myspr[50]},
-            {trigger = function() p.hitlen = mid(25, p.hitlen * 1.5, 60) ;  p.hitwid = mid(15, p.hitwid * 1.5, 35) end, valid = function() return p.hitlen < 60 end, name = "increase reach", icon = myspr[52]},
-            {trigger = function() p.hit_dmg += 7 end, valid = function() return true end, name = "increase damage", icon = myspr[49]},
-    },
-
     hp = 100,
     maxhp = 100,
     lifesteal = false,
     paralize = false,
     paralize_t = 25,
     dmg_received = 1,
-    hp_upgrades = {
-            {trigger = function() global.enemy.xp_drop *= 2; global.oven.xp_drop *= 2 end, valid = function() return true end, name = "receive more xp", icon = myspr[49]},
-            {trigger = function() global.enemy.xp_drop *= 2; global.oven.xp_drop *= 2 end, valid = function() return true end, name = "receive more xp", icon = myspr[49]},
-            {trigger = function() global.enemy.xp_drop *= 2; global.oven.xp_drop *= 2 end, valid = function() return true end, name = "receive more xp", icon = myspr[49]},
-            {trigger = function() p.hp = mid(1, p.hp + .3 * p.maxhp, p.maxhp) end, valid = function() return p.hp != p.maxhp end, name = "heal", icon = myspr[53]},
-            {trigger = function() p.maxhp *= 1.15 end, valid = function() return true end, name = "increase max hp", icon = myspr[53]},
-            {trigger = function() p.lifesteal = true end, valid = function() return  not p.lifesteal end, name = "lifesteal", icon = myspr[52]},
-            {trigger = function() p.dmg_received *= .75 end, valid = function() return p.dmg_received > .3 end, name = "reduced received damage", icon = myspr[48]},
-            {trigger = function() p.paralize = true end, valid = function() return not p.paralize end, name = "stun hit enemies", icon = myspr[52]},
-            {trigger = function() p.hp = mid(1, p.paralize_t + 30, 120) end, valid = function() return p.paralize  and p.paralize_t < 120 end, name = "longer stun", icon = myspr[50]},
-    },
-
+    xp_received = 1,
     xp = 0,
     level = 1,
-    level_ups = {1, 2, 3, 3, 3, 5, 10, 10, 10, 10, 20, 20, 30, 50, 100, 200, 500, 1000},
-
-    dustt = 60,
-
+    level_ups = split"3,3,4,4,4,5,5,5,5,8,9,10,10,10,10,20,20,30,50,60,70,80,100,150,200,300,400,500,750,1000",
     upd = player_upd,
     drw = player_drw,
     init = player_init,

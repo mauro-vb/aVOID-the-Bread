@@ -21,10 +21,11 @@ end
 function story_upd(_𝘦𝘯𝘷)
     if imgi > #images then
         if btnp(🅾️) or btnp(❎) and trans == nil then
-            transition({ new_scene = game })
+            trans = transition({ new_scene = game })
         end
     else
         if btnp(🅾️) or btnp(❎) then
+            sfx(47)
             dotween(images[imgi], "x", images[imgi].tx, frames, overshoot, reset_pressed(_𝘦𝘯𝘷))
             dotween(images[imgi], "y", images[imgi].ty, frames, overshoot)
             imgi += 1

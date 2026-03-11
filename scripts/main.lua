@@ -21,6 +21,7 @@ function _init()
     startpx, startpy = maplims.maxx / 2, maplims.maxy / 2
     debug_on = false
     scene:load(ss)
+    --scene:load(ss)
 end
 
 function _update60()

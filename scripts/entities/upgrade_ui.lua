@@ -1,6 +1,7 @@
 upgrade_ui = game_object:extend({
     selected = 1,
     init = function(_𝘦𝘯𝘷)
+        age = 0
         buttons = {}
         x = scene.cam.x; y = scene.cam.y
         global.paused = true
@@ -17,6 +18,7 @@ upgrade_ui = game_object:extend({
         sbutt = buttons[selected]
     end,
     upd = function(_𝘦𝘯𝘷)
+        age += 1
         if btnp(➡️) then
             sfx(8)
             selected += 1
@@ -42,6 +44,11 @@ upgrade_ui = game_object:extend({
         end
     end,
     drw = function(_𝘦𝘯𝘷)
+        --rectfill(x - 64, y - 64, x + 64, y - 56, 7)
+        if age < 70 then
+            print("\^o040\^w\^t◆ lvl " .. tostr(p.level) .. " ◆", x - 42, y - 50,
+                sin(age / 12) > -.85 and 7 or 15)
+        end
         drw_group(buttons)
         rectfill(x - 64, y + 54, x + 64, y + 64, 7)
         print(sbutt.upgrade.name, x - 2 * #sbutt.upgrade.name, y + 57, 0)

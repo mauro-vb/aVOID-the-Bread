@@ -1,24 +1,23 @@
 function baguette_dash(_𝘦𝘯𝘷)
     dashing = true
     local chargex, chargey = (-dirtop.x * 8), (-dirtop.y * 8)
-    local chargef = 25
+    local chargef = 20
 
     local maxforce = 60
     local dashforce = mid(15, disto(_𝘦𝘯𝘷, p), maxforce) + rndrange(-5,5)
-    local dashf = mid(40, 50 * (dashforce / maxforce), 60)
+    local dashf = mid(40, dashspd - 10 * (dashforce / maxforce), dashspd)
     local dashx = dirtop.x * dashforce
     local dashy = dirtop.y * dashforce
 
-    local trans = overshoot
     chaintweens({
         {
             tween_factory(_𝘦𝘯𝘷, "x", x + chargex, chargef, smoothstep),
             tween_factory(_𝘦𝘯𝘷, "y", y + chargey, chargef, smoothstep)
         },
-        tween_wait(15),
+     --   tween_wait(1),
         {
-            tween_factory(_𝘦𝘯𝘷, "x", x + dashx, dashf, trans),
-            tween_factory(_𝘦𝘯𝘷, "y", y + dashy, dashf, trans)
+            tween_factory(_𝘦𝘯𝘷, "x", x + dashx, dashf, overshoot),
+            tween_factory(_𝘦𝘯𝘷, "y", y + dashy, dashf, overshoot)
         }
     }, function() dashing = false end, true)
 end
@@ -69,7 +68,8 @@ function baguette_drw(_𝘦𝘯𝘷)
 end
 
 baguette = enemy:extend({
-    hp = 30,
+
+    dashspd = 60,
     move_speed = .5,
     sprarr = myspr[26],
     sprarrs = {myspr[26], myspr[27], myspr[28]},
@@ -77,7 +77,10 @@ baguette = enemy:extend({
     drw = baguette_drw,
     timer = 120,
     ai_state = "wait",
-    waitt = 180,
     variationt = 50,
     dashing = false,
+    enemy_init = function(_𝘦𝘯𝘷)
+        hp = enstats[enstats_i][3][1]
+        waitt = enstats[enstats_i][2][2]
+    end,
 })

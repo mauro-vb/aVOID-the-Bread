@@ -8,6 +8,7 @@ transition = game_object:extend({
     shrink = false,
     trans = smootherstep,
     init = function(_𝘦𝘯𝘷)
+        sfx(42)
         circles = {}
         global.trans = _𝘦𝘯𝘷
         for i = 1, n do

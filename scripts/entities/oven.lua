@@ -1,8 +1,13 @@
 function oven_spawn(_𝘦𝘯𝘷)
     sfx(7)
-    for i = 1, rndrange(1, mid(1, p.level / 3, 15)) do
+    for i = 1, mid(1, difficulty / 2, 10) do
         local en = rnd(enemies)
-        en:new({ x = x, y = y + 10 })
+        if #entities < 300 then
+            en({
+                x = x + rndrange(-6, 6),
+                y = y + 10 + rndrange(-4, 4),
+            })
+        end
     end
     sprarr = myspr[30]
 end
@@ -24,21 +29,19 @@ function oven_upd(_𝘦𝘯𝘷)
     end
 end
 
-function oven_drw(_𝘦𝘯𝘷)
-    age += 1
-    mspr(sprarr, x, y)
-    drwhp(_𝘦𝘯𝘷)
-end
-
 oven = enemy:extend({
     age = 0,
-    hp = 55,
+
     state = "active",
     size = "small",
-    enemies = { baguette, loaf, bagel },
-    spawn_rate = 1800,
+    enemies = { bun, baguette, loaf, bagel },
     xp_drop = 3,
-    drw = oven_drw,
+    drw = function(_𝘦𝘯𝘷)
+        age += 1
+        mspr(sprarr, x, y)
+        drwhp(_𝘦𝘯𝘷)
+        --drw_indicator(_𝘦𝘯𝘷)
+    end,
     upd = oven_upd,
     c = 86,
     destroy = function(_𝘦𝘯𝘷)
@@ -46,13 +49,26 @@ oven = enemy:extend({
         del(ovens, _𝘦𝘯𝘷)
         if (p != nil) then p.xp += xp_drop end
         global.encount.OVENS += 1
-        spawn_oven()
-        spawn_oven()
+    end,
+    drw_indicator = function(_𝘦𝘯𝘷)
+        if not collides(_𝘦𝘯𝘷, cam) then
+            local margin = 4
+            local sx = mid(cam.x - 64 + margin, x, cam.x + 64 - margin)
+            local sy = mid(cam.y - 64 + margin, y, cam.y + 64 - margin)
+
+            local size = flr(lerp(1, 3, 1 - disto(_𝘦𝘯𝘷, p) / 300))
+            rectfill(sx - size, sy - size, sx + size, sy + size, (sprarr == myspr[31] and sin(age / 10) > -.5) and 9 or 6)
+            if size >= 1 then
+                rect(sx - size, sy - size, sx + size, sy + size, 5)
+            end
+
+            --printh(disto(_𝘦𝘯𝘷, p))
+        end
     end,
     enemy_init = function(_𝘦𝘯𝘷)
+        hp = enstats[enstats_i][4][1]
+        spawn_rate = enstats[enstats_i][4][2]
         oven_spawn(_𝘦𝘯𝘷)
-        spawn_rate -= (p.level - 1) * 100
-        spawn_rate = mid(1800, spawn_rate, 300)
         sfx(19)
         if size == "small" then
             sizex, sizey = 16, 16

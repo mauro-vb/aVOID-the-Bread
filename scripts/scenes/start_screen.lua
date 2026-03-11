@@ -7,6 +7,7 @@ function ss_init(_𝘦𝘯𝘷)
     x, y = startpx, startpy
     mapx, mapy = rndrange(0, 6), 0
     camera(startpx - 64, startpy - 64)
+    --b = bagel({x = peek2(0x5f28) + 64, y = peek2(0x5f2a) + 64, dummy = true, p = {x = startpx, y = startpy, post = 0}})
 end
 
 function ss_upd(_𝘦𝘯𝘷)
@@ -14,14 +15,16 @@ function ss_upd(_𝘦𝘯𝘷)
     if btnp(🅾️) or btnp(❎) then
         pressed = true
         --scene:load(game)
-        transition({new_scene = story })
+        transition({ new_scene = story })
     end
+    --b:upd()
 end
 
 function ss_drw(_𝘦𝘯𝘷)
     map(mapx, mapy)
     print("\^w\^t\^o040 A-VOID \nTHE BREAD", x - 35 , y - 30, 15)
     print("\^o040PRESS ❎ / 🅾️", x - 28 , y , 15)
+    --b:drw()
 end
 
 ss = scene:extend({

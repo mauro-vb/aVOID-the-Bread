@@ -9,14 +9,15 @@ function enemy_upd(_𝘦𝘯𝘷)
 		end
 
 	elseif state=="active" then
-		if collides(_𝘦𝘯𝘷,p) do
-			p.hp -= p.dmg_received
-			destroy(_𝘦𝘯𝘷, false)
-			return
-		end
-		if hp <= 0 then
-			destroy(_𝘦𝘯𝘷, true)
-		end
+	    if not dummy then
+    		if collides(_𝘦𝘯𝘷,p) do
+    			destroy(_𝘦𝘯𝘷, false)
+    			return
+    		end
+    		if hp <= 0 then
+    			destroy(_𝘦𝘯𝘷, true)
+    		end
+	    end
 		-- custom behavior
 
 		enemy_ai(_𝘦𝘯𝘷)
@@ -33,6 +34,7 @@ end
 
 enemy = class:extend({
     state = "active",
+    dummy = false,
     xp_drop = 1,
     dmg = 20,
     paralize_t = 0,
@@ -55,11 +57,11 @@ enemy = class:extend({
             if is(_𝘦𝘯𝘷, bagel) then global.encount.BAGELS += 1
             elseif is(_𝘦𝘯𝘷, baguette) then global.encount.BAGUETTES += 1
             elseif is(_𝘦𝘯𝘷, loaf) then global.encount.LOAVES += 1 end
-            if (p != nil) then p.xp += xp_drop end
+            if (p != nil) then p.xp += xp_drop * p.xp_received end
         else
             sfx(23)
             enhurt(p)
-            if (p != nil) then p.hp -= dmg end
+            if (p != nil) then p.hp -= dmg * p.dmg_received end
         end
     end,
     x = 64, y = 64,
@@ -70,9 +72,9 @@ enemy = class:extend({
     drwhp = function(_𝘦𝘯𝘷)
 
         if hp < initial_hp then
-            local barwidth = 14
+            local barwidth = 13
             local offy = 8
-            local progress = lerp(0, barwidth, hp / initial_hp)
+            local progress = lerp(0, barwidth, mid(0, hp / initial_hp, 1))
             local bx = x - barwidth / 2
             line(bx, y + offy, bx + barwidth, y + offy, 15)
             line(bx, y + offy, bx + progress, y + offy, 11)

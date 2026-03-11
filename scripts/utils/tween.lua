@@ -11,7 +11,6 @@ function tween_wait(f, callback)
 end
 
 function tween(obj, k, v, f, transition, callback, pausable)
-    --pausable = pausable == nil and false or true
     local initial_v = obj[k]
     transition = transition or linear
     callback = callback or _noop
@@ -102,52 +101,52 @@ function linear(t)
     return t
 end
 
-function expo(t)
-    if t == 0 then return 0 end
-    if t == 1 then return 1 end
+--function expo(t)
+--    if t == 0 then return 0 end
+--    if t == 1 then return 1 end
+--
+--    if t < 0.5 then
+--        return 0.5 * 2 ^ (20 * t - 10)
+--    else
+--        return 1 - 0.5 * 2 ^ (-20 * t + 10)
+--    end
+--end
+--
+--function cubic(t)
+--    if t < 0.5 then
+--        return 4 * t * t * t
+--    else
+--        t -= 1
+--        return 1 + 4 * t * t * t
+--    end
+--end
+--
+--function quad(t)
+--    if (t < .5) then
+--        return t * t * 2
+--    else
+--        t -= 1
+--        return 1 - t * t * 2
+--    end
+--end
+--
+--function quart(t)
+--    if t < 0.5 then
+--        return 8 * t * t * t * t
+--    else
+--        t -= 1
+--        return 1 - 8 * t * t * t * t
+--    end
+--end
 
-    if t < 0.5 then
-        return 0.5 * 2 ^ (20 * t - 10)
-    else
-        return 1 - 0.5 * 2 ^ (-20 * t + 10)
-    end
-end
-
-function cubic(t)
-    if t < 0.5 then
-        return 4 * t * t * t
-    else
-        t -= 1
-        return 1 + 4 * t * t * t
-    end
-end
-
-function quad(t)
-    if (t < .5) then
-        return t * t * 2
-    else
-        t -= 1
-        return 1 - t * t * 2
-    end
-end
-
-function quart(t)
-    if t < 0.5 then
-        return 8 * t * t * t * t
-    else
-        t -= 1
-        return 1 - 8 * t * t * t * t
-    end
-end
-
-function quint(t)
-    if t < 0.5 then
-        return 16 * t ^ 5
-    else
-        t -= 1
-        return 1 + 16 * t ^ 5
-    end
-end
+--function quint(t)
+--    if t < 0.5 then
+--        return 16 * t ^ 5
+--    else
+--        t -= 1
+--        return 1 + 16 * t ^ 5
+--    end
+--end
 
 function smoothstep(t)
     return t * t * (3 - 2 * t)
@@ -166,11 +165,11 @@ function overshoot(t)
     end
 end
 
-function elastic(t)
-    if t < .5 then
-        return 2 ^ (10 * 2 * t - 10) * cos(2 * 2 * t - 2) / 2
-    else
-        t -= .5
-        return 1 - 2 ^ (-10 * 2 * t) * cos(2 * 2 * t) / 2
-    end
-end
+-- function elastic(t)
+--     if t < .5 then
+--         return 2 ^ (10 * 2 * t - 10) * cos(2 * 2 * t - 2) / 2
+--     else
+--         t -= .5
+--         return 1 - 2 ^ (-10 * 2 * t) * cos(2 * 2 * t) / 2
+--     end
+-- end

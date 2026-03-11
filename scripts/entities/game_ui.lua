@@ -5,7 +5,7 @@ cd_bar = game_object:extend({
         x = p.x
         y = p.y + 9
 
-        local progress = lerp(0, barwidth, 1 - p.hit_t / p.hit_cd)
+        local progress = lerp(0, barwidth, mid(0, 1 - p.hit_t / p.hit_cd, 1))
         local bx = x - barwidth / 2
         line(bx, y, bx + barwidth, y, 0)
         line(bx, y, bx + progress, y, 7)
@@ -20,7 +20,7 @@ dash_bar = game_object:extend({
             x = p.x
             y = p.y + 11
 
-            local progress = lerp(0, barwidth, 1 - p.dasht / p.dash_cd)
+            local progress = lerp(0, barwidth, mid(0, 1 - p.dasht / p.dash_cd, 1))
             local bx = x - barwidth / 2
             line(bx, y, bx + barwidth, y, 0)
             line(bx, y, bx + progress, y, 12)
@@ -34,7 +34,7 @@ xp_bar = game_object:extend({
     drw = function(_𝘦𝘯𝘷)
         x = cam.x
         y = cam.y + 50
-        progress = lerp(0, barwidth - 2, p.xp / p.level_ups[min(p.level, #p.level_ups)])
+        progress = lerp(0, barwidth - 2, mid(0, p.xp / p.level_ups[min(p.level, #p.level_ups)], 1))
         local bx = flr(x - barwidth / 2)
         rectfill(bx, y, bx + barwidth, y + barheight, barc)
         rectfill(bx + 1, y + 1, bx + 1 + progress, y + barheight - 1, 12)
@@ -60,6 +60,7 @@ hp_bar = game_object:extend({
     end
 })
 
+
 game_ui = game_object:extend({
     barc = 15,
     bars = {},
@@ -74,5 +75,8 @@ game_ui = game_object:extend({
     end,
     drw = function(_𝘦𝘯𝘷)
         drw_group(bars)
+        for oven in all(ovens) do
+            oven:drw_indicator()
+        end
     end,
 })

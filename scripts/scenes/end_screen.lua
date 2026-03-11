@@ -25,7 +25,7 @@ function end_drw(_𝘦𝘯𝘷)
     local strs = {"BAGELS", "BAGUETTES", "LOAVES", "OVENS"}
     for e=1,#strs do
         local tmp = strs[e]
-        local verb = tmp == "OVENS" and "DESTROYED " or "COOKED "
+        local verb = tmp == "OVENS" and "DESTROYED " or "TOASTED "
         print("\^o040"..verb..tostr(encount[tmp]).." VOID "..tmp, x -45 , 20 + y + 8 * e, 15)
     end
     print("\^w\^t\^o040GAME OVER", x - 35 , y - 30, 15)

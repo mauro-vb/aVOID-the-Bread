@@ -1,6 +1,4 @@
-function spawn_oven(forced)
-    if #ovens > p.level and not forced then return end
-
+function spawn_oven()
     local oven_pos
 
     local function checkcol(ovenpos)
@@ -36,29 +34,37 @@ function restric_movement(_𝘦𝘯𝘷)
 end
 
 function game_loop(_𝘦𝘯𝘷)
-    if t % 3000 == 0 then
-        spawn_oven(true)
+    difficulty = max(difficulty,flr(t / 1500) + flr(p.level / 2.5))
+    local novens =  mid(2, difficulty / 5, 4)
+    local oven_spawn_rate = flr(mid(600, 900 - difficulty * 20 + novens * 180, 1200))
+
+    global.enstats_i = mid(1, ceil(difficulty / 3), #enstats)
+    if t % oven_spawn_rate == 0 then
+        for n=1, novens do
+            if #ovens == 0 then spawn_oven() end
+            if #ovens < 8 then
+                spawn_oven()
+            end
+        end
     end
     if p.hp <= 0 then end_game(_𝘦𝘯𝘷) end
 end
 
 function end_game(_𝘦𝘯𝘷)
     over = true
-    transition({ new_scene = end_screen, ox = cam.x - 64, oy = cam.y - 64 })
-    --startpx, startpy = cam.x, cam.y
-	--global.scene:load(end_screen)
-	--global.p = {x = p.x, y = p.y }
-	--global.cam = nil
+    transition({ new_scene = end_screen})
 end
 
 function game_init(_𝘦𝘯𝘷)
+    global.enstats_i = 1
+    global.difficulty = 0
     over = false
     restore_gfx()
     t = 0
 
     global.encount = { BAGELS = 0, BAGUETTES = 0, LOAVES = 0, OVENS = 0 }
     global.entities = {}
-    global.p = player({ x = startpx, y = startpy, hp = 1 })
+    global.p = player({ x = startpx, y = startpy })
     global.parts = {}
     global.ui = game_ui()
 
@@ -87,7 +93,6 @@ end
 function game_drw(_𝘦𝘯𝘷)
     cls(7)
     map()
-
     drw_group(entities)
     drw_group(attacks)
     if (over) return

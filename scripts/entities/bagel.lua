@@ -31,9 +31,7 @@ function bagel_drw(_𝘦𝘯𝘷)
 end
 
 bagel = enemy:extend({
-    hp = 20,
-    move_speed = .2,
-    orbit_speed = .6,
+
     rotation_timer = 0,
     eyepositions = {
         {{x = 0, y = 2}, {x = -3, y = 2}},
@@ -44,6 +42,9 @@ bagel = enemy:extend({
     sprarr = myspr[25],
     drw = bagel_drw,
     enemy_init = function(_𝘦𝘯𝘷)
+        hp = enstats[enstats_i][3][1]
+        move_speed = enstats[enstats_i][3][2]
+        orbit_speed = move_speed * 3
         rotation_dir = chance() and 1 or -1
     end,
     last_pdist = 100,
