@@ -12,7 +12,7 @@ end
 
 -- setup global references
 
-global = _𝘦𝘯𝘷
+global = _ENV
 _noop = function() end
 
 function _init()

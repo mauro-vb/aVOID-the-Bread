@@ -1,4 +1,4 @@
-function end_init(_𝘦𝘯𝘷)
+function end_init(_ENV)
     pressed = false
     _upd = end_upd
     _drw = end_drw
@@ -6,7 +6,7 @@ function end_init(_𝘦𝘯𝘷)
     y = cam.y
 end
 
-function end_upd(_𝘦𝘯𝘷)
+function end_upd(_ENV)
     if (pressed) return
 
     if btnp(❎) then
@@ -19,7 +19,7 @@ function end_upd(_𝘦𝘯𝘷)
     end
 end
 
-function end_drw(_𝘦𝘯𝘷)
+function end_drw(_ENV)
     --
     map()
     local strs = {"BAGELS", "BAGUETTES", "LOAVES", "OVENS"}

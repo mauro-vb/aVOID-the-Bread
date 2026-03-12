@@ -62,7 +62,7 @@ end
 
 
 -- movement
-function disto(_𝘦𝘯𝘷, t)
+function disto(_ENV, t)
 	local diffx = (x - t.x) / 16
 	local diffy = (y - t.y) / 16
 	local res= diffx * diffx + diffy * diffy
@@ -73,7 +73,7 @@ amap = split" 2,7,4,8,1,5,3,6"
 butarr = split "1,2,0,3,5,6,3,4,8,7,4,0,1,2,0"
 dirx = split "-1,1, 0,0,-0.7, 0.7,0.7,-0.7"
 diry = split " 0,0,-1,1,-0.7,-0.7,0.7, 0.7"
-function cobblefix(_𝘦𝘯𝘷, dir)
+function cobblefix(_ENV, dir)
     if lastdir != dir and dir >= 5 then
         --anti cobblestone
         x = flr(x) + .5
@@ -81,14 +81,14 @@ function cobblefix(_𝘦𝘯𝘷, dir)
     end
 end
 
-function getdir(_𝘦𝘯𝘷, target)
+function getdir(_ENV, target)
     local ddx = target.x - x
     local ddy = target.y - y
     local distance = sqrt(ddx * ddx + ddy * ddy)
     return {x = ddx / distance, y = ddy / distance}
 end
 
-function setdir(_𝘦𝘯𝘷, target)
+function setdir(_ENV, target)
     local ddx = target.x - x
     local ddy = target.y - y
     local distance = sqrt(ddx * ddx + ddy * ddy)
@@ -96,21 +96,21 @@ function setdir(_𝘦𝘯𝘷, target)
     dy = ddy / distance
 end
 
-function setcardinaldir(_𝘦𝘯𝘷, p, nofix)
+function setcardinaldir(_ENV, p, nofix)
 	ang = atan2(p.x - x, y - p.y)
 	local si = flr((ang * 8+ .5) % 8) + 1
 	local dir = amap[si]
 	dx = dirx[dir]
 	dy = diry[dir]
 	if not nofix then
-	    cobblefix(_𝘦𝘯𝘷, dir)
+	    cobblefix(_ENV, dir)
 	end
 	lastdir = dir
 end
 
 -- collision
 
-function collides(_𝘦𝘯𝘷, b)
+function collides(_ENV, b)
     if (y - sizey / 2 > b.y + b.sizey / 2) return false
     if (b.y - b.sizey / 2 > y + sizey / 2) return false
     if (x - sizex / 2> b.x + b.sizex / 2) return false
@@ -131,11 +131,11 @@ function mspr(s, x, y, fx, fy)
     )
 end
 
-function drw_collision_box(_𝘦𝘯𝘷)
-    local sizex = sizex / 2
-    local sizey = sizey / 2
-    rect(x - sizex, y - sizey, x + sizex, y + sizey, 0)
-end
+--function drw_collision_box(_ENV)
+--    local sizex = sizex / 2
+--    local sizey = sizey / 2
+--    rect(x - sizex, y - sizey, x + sizex, y + sizey, 0)
+--end
 
 function cycanim(age, arr, spd, inv)
     local spd = spd or 1

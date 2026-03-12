@@ -4,13 +4,13 @@ mycam = game_object:extend({
 
     sizex = 128, sizey = 128,
     owner = nil,
-    init = function (_𝘦𝘯𝘷)
+    init = function (_ENV)
         minx = maplims.minx; maxx = maplims.maxx
         miny = maplims.miny; maxy = maplims.maxy
         x = owner.x
         y = owner.y
     end,
-    upd = function(_𝘦𝘯𝘷)
+    upd = function(_ENV)
         if (owner == nil) return
         local ox, oy = owner.x, owner.y
         -- X axis

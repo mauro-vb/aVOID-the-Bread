@@ -1,11 +1,11 @@
 
-function bagel_ai(_𝘦𝘯𝘷)
+function bagel_ai(_ENV)
     if (p == nil) return nil
-    setdir(_𝘦𝘯𝘷, p)
-    local pdist = disto(_𝘦𝘯𝘷, p)
+    setdir(_ENV, p)
+    local pdist = disto(_ENV, p)
     local dist_thresh = 50
     if  pdist > dist_thresh and last_pdist < dist_thresh  and abs(rotation_dir) > .5 then
-        dotween(_𝘦𝘯𝘷, "rotation_dir", -sgn(rotation_dir), 90, quad)
+        dotween(_ENV, "rotation_dir", -sgn(rotation_dir), 90, quad)
     else
         local tangent_x = -dy * rotation_dir
         local tangent_y = dx * rotation_dir
@@ -19,10 +19,10 @@ function bagel_ai(_𝘦𝘯𝘷)
     end
 end
 
-function bagel_drw(_𝘦𝘯𝘷)
+function bagel_drw(_ENV)
     ovalfill(x - 7, y + 1, x + 5, y + 6, 2)
 	mspr(sprarr, x, y)
-	drwhp(_𝘦𝘯𝘷)
+	drwhp(_ENV)
 	local eyespos = cycanim(age, eyepositions, 10, sgn(rotation_dir) == -1)
 	for pos in all(eyespos) do
 		pset(x + pos.x, y + pos.y, x < p.x and 11 or 0)
@@ -41,7 +41,7 @@ bagel = enemy:extend({
     },
     sprarr = myspr[25],
     drw = bagel_drw,
-    enemy_init = function(_𝘦𝘯𝘷)
+    enemy_init = function(_ENV)
         hp = enstats[enstats_i][3][1]
         move_speed = enstats[enstats_i][3][2]
         orbit_speed = move_speed * 3

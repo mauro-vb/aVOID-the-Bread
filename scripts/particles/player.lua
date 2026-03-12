@@ -6,7 +6,7 @@ function hit_particles(a)
             sizex = a.sizex,
             sizey = a.sizey,
             c = 12,
-            pdrw = function(_𝘦𝘯𝘷)
+            pdrw = function(_ENV)
                 rectfill(x - sizex / 2, y - sizey / 2, x + sizex / 2, y + sizey / 2, c)
             end,
             maxage = 20,
@@ -84,7 +84,7 @@ function hit_particles(a)
     end
 end
 
-function enhurt(_𝘦𝘯𝘷)
+function enhurt(_ENV)
     n = 20
     local c = 142
     circlep({
@@ -117,7 +117,7 @@ function enhurt(_𝘦𝘯𝘷)
     end
 end
 
-function enhit(_𝘦𝘯𝘷)
+function enhit(_ENV)
     n = 10
     circlep({
         size = 10,
@@ -143,7 +143,7 @@ function enhit(_𝘦𝘯𝘷)
     end
 end
 
--- function dust(_𝘦𝘯𝘷)
+-- function dust(_ENV)
 --     n = rndrange(2, 4)
 --     local y = y + 5
 --     for i = 1, n do

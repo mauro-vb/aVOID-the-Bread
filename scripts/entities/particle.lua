@@ -1,4 +1,4 @@
----function particle_upd(_𝘦𝘯𝘷)
+---function particle_upd(_ENV)
 ---    -- age and wait
 ---    if wait then
 ---        wait -= 1
@@ -100,7 +100,7 @@
 ---                tosize = nil
 ---                incrsize = -0.1 - rnd(0.3)
 ---            else
----                del(global.parts, _𝘦𝘯𝘷)
+---                del(global.parts, _ENV)
 ---            end
 ---            ctab = nil
 ---            onend = nil
@@ -119,12 +119,12 @@
 ---    ctabv = nil,
 ---    spd = 1,
 ---    upd = particle_upd,
----    init = function(_𝘦𝘯𝘷)
----        add(parts, _𝘦𝘯𝘷)
+---    init = function(_ENV)
+---        add(parts, _ENV)
 ---    end,
----    drw = function(_𝘦𝘯𝘷)
+---    drw = function(_ENV)
 ---        if wait then return end
----        pdrw(_𝘦𝘯𝘷)
+---        pdrw(_ENV)
 ---    end
 ---})
 ---

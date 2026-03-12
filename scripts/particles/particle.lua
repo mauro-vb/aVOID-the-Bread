@@ -1,4 +1,4 @@
-function dopart(_𝘦𝘯𝘷)
+function dopart(_ENV)
     -- age and wait
     if wait then
         wait -= 1
@@ -100,7 +100,7 @@ function dopart(_𝘦𝘯𝘷)
                 tosize = nil
                 incrsize = -0.1 - rnd(0.3)
             else
-                del(parts, _𝘦𝘯𝘷)
+                del(parts, _ENV)
             end
             ctab = nil
             onend = nil
@@ -117,24 +117,24 @@ particle = game_object:extend({
     ctabv = nil,
     spd = 1,
     upd = dopart,
-    init = function(_𝘦𝘯𝘷)
+    init = function(_ENV)
         ox = x
         oy = y
 
-        add(parts, _𝘦𝘯𝘷)
-        if pinit then pinit(_𝘦𝘯𝘷) end
+        add(parts, _ENV)
+        if pinit then pinit(_ENV) end
     end,
-    drw = function(_𝘦𝘯𝘷)
+    drw = function(_ENV)
         if (wait) return
-        pdrw(_𝘦𝘯𝘷)
+        pdrw(_ENV)
     end
 })
 
-function tweenp_init(_𝘦𝘯𝘷)
-    add(global.parts, _𝘦𝘯𝘷)
+function tweenp_init(_ENV)
+    add(global.parts, _ENV)
     if tweens then
         chaintweens(tweens, function()
-            del(global.parts, _𝘦𝘯𝘷)
+            del(global.parts, _ENV)
         end)
     end
 end
@@ -144,7 +144,7 @@ tweenp = particle:extend({
     init = tweenp_init,
 })
 
-function drw_circle(_𝘦𝘯𝘷)
+function drw_circle(_ENV)
     if border then
         fillp(0xffff)
         circfill(x, y, size / 2 + 1, c)
@@ -163,16 +163,16 @@ rectp = particle:extend({
     iwidth = 2,
     iheight = 1,
     border = false,
-    pinit = function (_𝘦𝘯𝘷)
+    pinit = function (_ENV)
         width = iwidth * size
         height = iheight * size
     end,
-    upd = function (_𝘦𝘯𝘷)
+    upd = function (_ENV)
         width = size * iwidth
         height = size * iheight
-        dopart(_𝘦𝘯𝘷)
+        dopart(_ENV)
     end,
-    drw = function (_𝘦𝘯𝘷)
+    drw = function (_ENV)
         local w, h = width / 2, height / 2
         rectfill(x - w, y - h, x + w, y + h, c)
         if border then

@@ -1,4 +1,4 @@
-function player_dash(_𝘦𝘯𝘷)
+function player_dash(_ENV)
     if btnp(❎) and can_dash then
         sfx(28)
         dashing = true
@@ -13,8 +13,8 @@ function player_dash(_𝘦𝘯𝘷)
         local dashx, dashy = dx * dashforce, dy * dashforce
 
         local dashf = 10
-        dotween(_𝘦𝘯𝘷, "x", x + dashx, dashf, trans)
-        dotween(_𝘦𝘯𝘷, "y", y + dashy, dashf, trans, function() dashing = false; dasht = dash_cd end)
+        dotween(_ENV, "x", x + dashx, dashf, trans)
+        dotween(_ENV, "y", y + dashy, dashf, trans, function() dashing = false; dasht = dash_cd end)
     else
         if dasht > 0 then
             dasht -=1
@@ -24,8 +24,8 @@ function player_dash(_𝘦𝘯𝘷)
     end
 end
 
-function player_hit(_𝘦𝘯𝘷)
-    local function get_area(_𝘦𝘯𝘷)
+function player_hit(_ENV)
+    local function get_area(_ENV)
         local area = {}
         area.y = y - 4
         if facing_dir == "u" then area.y = y - hitlen / 2
@@ -47,7 +47,7 @@ function player_hit(_𝘦𝘯𝘷)
         return area
     end
 
-    local area = get_area(_𝘦𝘯𝘷)
+    local area = get_area(_ENV)
     hit_particles(area)
     for en in all(entities) do
         if (en:is(enemy) or en:is(oven)) and collides(area, en) then
@@ -61,11 +61,11 @@ function player_hit(_𝘦𝘯𝘷)
     sfx(17)
 end
 
-function player_hit_upd(_𝘦𝘯𝘷)
+function player_hit_upd(_ENV)
     if hitting and (age \ hitspd) % #anim + 1 == #anim then
         hitting = false
-        hit(_𝘦𝘯𝘷)
-        change_anim(_𝘦𝘯𝘷, facing_dir.."_idle", facing_dir == "l", idlespd)
+        hit(_ENV)
+        change_anim(_ENV, facing_dir.."_idle", facing_dir == "l", idlespd)
     end
 	if hit_t > 0 then
 	    hit_t -= 1
@@ -82,7 +82,7 @@ function player_hit_upd(_𝘦𝘯𝘷)
 	end
 end
 
-function player_move(_𝘦𝘯𝘷)
+function player_move(_ENV)
 
     if (dashing) return
 
@@ -93,7 +93,7 @@ function player_move(_𝘦𝘯𝘷)
     if btn(⬇️) then input_dir += 8 end
     input_dir = butarr[input_dir]
     dx = dirx[input_dir]; dy = diry[input_dir]
-    cobblefix(_𝘦𝘯𝘷, input_dir)
+    cobblefix(_ENV, input_dir)
     local nx, ny = x + dx * mv_spd, y + dy * mv_spd
     x = nx; y = ny
     if input_dir != 0 then
@@ -104,11 +104,11 @@ function player_move(_𝘦𝘯𝘷)
 		    step_timer=20
 		end
 	 end
-    player_dash(_𝘦𝘯𝘷)
-    restric_movement(_𝘦𝘯𝘷)
+    player_dash(_ENV)
+    restric_movement(_ENV)
 end
 
-function change_anim(_𝘦𝘯𝘷, name, fx, spd)
+function change_anim(_ENV, name, fx, spd)
     if anim != anims[name] then
         age = 0
         spd = spd or 10
@@ -119,43 +119,43 @@ function change_anim(_𝘦𝘯𝘷, name, fx, spd)
     end
 end
 
-function player_anim(_𝘦𝘯𝘷)
+function player_anim(_ENV)
     if hitting then
         if anim == anims.l_idle then
-            change_anim(_𝘦𝘯𝘷, "l_hit", true, hitspd)
+            change_anim(_ENV, "l_hit", true, hitspd)
         elseif anim == anims.r_idle then
-            change_anim(_𝘦𝘯𝘷, "r_hit", false, hitspd)
+            change_anim(_ENV, "r_hit", false, hitspd)
         elseif anim == anims.u_idle then
-            change_anim(_𝘦𝘯𝘷, "u_hit", false, hitspd)
+            change_anim(_ENV, "u_hit", false, hitspd)
         elseif anim == anims.d_idle then
-            change_anim(_𝘦𝘯𝘷, "d_hit", false, hitspd)
+            change_anim(_ENV, "d_hit", false, hitspd)
         end
     else
         if (lastdir == 0) return
         if input_dir == 1 or input_dir == 2 or input_dir >= 5 then
             local isleft = sgn(dx) == -1
             local side = isleft and "l" or "r"
-            change_anim(_𝘦𝘯𝘷, side.."_run", isleft, 7)
+            change_anim(_ENV, side.."_run", isleft, 7)
         elseif input_dir == 3 then
-            change_anim(_𝘦𝘯𝘷, "u_run")
+            change_anim(_ENV, "u_run")
         elseif input_dir == 4 then
-            change_anim(_𝘦𝘯𝘷, "d_run", false)
+            change_anim(_ENV, "d_run", false)
         else
             if (lastdir == 3) then
-                change_anim(_𝘦𝘯𝘷, "u_idle", false, idlespd)
+                change_anim(_ENV, "u_idle", false, idlespd)
             elseif (lastdir == 4) then
-                change_anim(_𝘦𝘯𝘷, "d_idle", false, idlespd)
+                change_anim(_ENV, "d_idle", false, idlespd)
             else
                 local isleft = lastdir == 1 or lastdir == 5
                 local side = isleft and "l" or "r"
-                change_anim(_𝘦𝘯𝘷, side.."_idle", isleft, idlespd)
+                change_anim(_ENV, side.."_idle", isleft, idlespd)
             end
         end
     end
 end
 
-function player_level_up(_𝘦𝘯𝘷)
-    sfx(14)--sfx(43)
+function player_level_up(_ENV)
+    sfx(14)
     local function get_upgrade(prev_upgs)
         local new_upg = nil
         local upg_type
@@ -181,21 +181,21 @@ function player_level_up(_𝘦𝘯𝘷)
     global.ui = upgrade_ui({upgrades = ups})
 end
 
-function player_upd_xp(_𝘦𝘯𝘷)
+function player_upd_xp(_ENV)
     local xp_required = level > #level_ups and level_ups[#level_ups] or level_ups[level]
     if xp >= xp_required then
         xp -= xp_required
         level += 1
-        player_level_up(_𝘦𝘯𝘷)
+        player_level_up(_ENV)
     end
 end
 
-function player_upd(_𝘦𝘯𝘷)
+function player_upd(_ENV)
     age += 1
-    player_move(_𝘦𝘯𝘷)
-    player_hit_upd(_𝘦𝘯𝘷)
-    player_anim(_𝘦𝘯𝘷, input_dir)
-    player_upd_xp(_𝘦𝘯𝘷)
+    player_move(_ENV)
+    player_hit_upd(_ENV)
+    player_anim(_ENV, input_dir)
+    player_upd_xp(_ENV)
 
     --if hp <= 0 then global.paused = true; transition({new_scene = end_screen}) end
 
@@ -204,26 +204,26 @@ function player_upd(_𝘦𝘯𝘷)
     lastdir = input_dir
 end
 
-function player_drw(_𝘦𝘯𝘷)
+function player_drw(_ENV)
     ovalfill(x - 4, y + 3, x + 4, y + 6, 2)
     sprarr = cycanim(age, anim, aspd)
     mspr(sprarr, x, y, flipx)
     if debug_on then
-        debug(_𝘦𝘯𝘷)
+        debug(_ENV)
     end
 end
 
-function player_debug(_𝘦𝘯𝘷)
-    drw_collision_box(_𝘦𝘯𝘷)
+function player_debug(_ENV)
+    drw_collision_box(_ENV)
     print(hitlen,x,y - 20,0)
 end
 
-function player_init(_𝘦𝘯𝘷)
+function player_init(_ENV)
     butarr[0] = 0
     anim = anims.d_idle
     hit_t = hit_cd
     hit_wait_t = hit_wait
-    add(entities, _𝘦𝘯𝘷)
+    add(entities, _ENV)
 end
 
 

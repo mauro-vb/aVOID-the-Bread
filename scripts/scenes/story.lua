@@ -1,6 +1,6 @@
-function story_init(_𝘦𝘯𝘷)
-    load_stored_gfx(story_gfx)
+function story_init(_ENV)
     pressed = false
+    load_stored_gfx(story_gfx)
     _upd = story_upd
     _drw = story_drw
     x, y = startpx, startpx - 64
@@ -18,24 +18,24 @@ function story_init(_𝘦𝘯𝘷)
     texts = split2d "\n🅾️/❎ to continue|looks like our poor,friendly baker is getting fired!|i guess she's got,nothing to loose now...|she decides to,bake one last batch...|she hears ominous sounds,coming from the oven...|the bread is alive!,and it is not friendly..."
 end
 
-function story_upd(_𝘦𝘯𝘷)
+function story_upd(_ENV)
     if imgi > #images then
-        if btnp(🅾️) or btnp(❎) and trans == nil then
-            trans = transition({ new_scene = game })
+        if (btnp(🅾️) or btnp(❎)) and not pressed then
+            pressed = true
+            transition({ new_scene = game })
         end
     else
         if btnp(🅾️) or btnp(❎) then
             sfx(47)
-            dotween(images[imgi], "x", images[imgi].tx, frames, overshoot, reset_pressed(_𝘦𝘯𝘷))
+            dotween(images[imgi], "x", images[imgi].tx, frames, overshoot)
             dotween(images[imgi], "y", images[imgi].ty, frames, overshoot)
             imgi += 1
         end
     end
 end
 
-function story_drw(_𝘦𝘯𝘷)
+function story_drw(_ENV)
     cls(2)
-    --map()
     rectfill(x - 64, y + 34, x + 128, y + 128, c)
     local text = texts[imgi] or texts[#texts]
     for i = 1, #text do
@@ -48,11 +48,6 @@ function story_drw(_𝘦𝘯𝘷)
 end
 
 story = scene:extend({
-    reset_pressed = function(_𝘦𝘯𝘷)
-        return function()
-            pressed = false
-        end
-    end,
     init = story_init,
     upd = story_upd,
     drw = story_drw,

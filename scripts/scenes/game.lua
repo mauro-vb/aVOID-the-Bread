@@ -28,12 +28,12 @@ function spawn_oven()
     }))
 end
 
-function restric_movement(_𝘦𝘯𝘷)
+function restric_movement(_ENV)
     x = mid(0, x, maplims.maxx)
     y = mid(0, y, maplims.maxy)
 end
 
-function game_loop(_𝘦𝘯𝘷)
+function game_loop(_ENV)
     difficulty = max(difficulty,flr(t / 1500) + flr(p.level / 2.5))
     local novens =  mid(2, difficulty / 5, 4)
     local oven_spawn_rate = flr(mid(600, 900 - difficulty * 20 + novens * 180, 1200))
@@ -47,15 +47,15 @@ function game_loop(_𝘦𝘯𝘷)
             end
         end
     end
-    if p.hp <= 0 then end_game(_𝘦𝘯𝘷) end
+    if p.hp <= 0 then end_game(_ENV) end
 end
 
-function end_game(_𝘦𝘯𝘷)
+function end_game(_ENV)
     over = true
     transition({ new_scene = end_screen})
 end
 
-function game_init(_𝘦𝘯𝘷)
+function game_init(_ENV)
     global.enstats_i = 1
     global.difficulty = 0
     over = false
@@ -77,7 +77,7 @@ function game_init(_𝘦𝘯𝘷)
     _drw = game_drw
 end
 
-function game_upd(_𝘦𝘯𝘷)
+function game_upd(_ENV)
     if (over) return
     ui:upd()
     if (paused) return
@@ -87,10 +87,10 @@ function game_upd(_𝘦𝘯𝘷)
     upd_group(parts)
     sorty(entities)
     cam:upd()
-    game_loop(_𝘦𝘯𝘷)
+    game_loop(_ENV)
 end
 
-function game_drw(_𝘦𝘯𝘷)
+function game_drw(_ENV)
     cls(7)
     map()
     drw_group(entities)

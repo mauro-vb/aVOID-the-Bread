@@ -1,4 +1,4 @@
-function enemy_upd(_𝘦𝘯𝘷)
+function enemy_upd(_ENV)
     age += 1
     local initx, inity = x, y
 	if state=="spawning" then
@@ -10,17 +10,17 @@ function enemy_upd(_𝘦𝘯𝘷)
 
 	elseif state=="active" then
 	    if not dummy then
-    		if collides(_𝘦𝘯𝘷,p) do
-    			destroy(_𝘦𝘯𝘷, false)
+    		if collides(_ENV,p) do
+    			destroy(_ENV, false)
     			return
     		end
     		if hp <= 0 then
-    			destroy(_𝘦𝘯𝘷, true)
+    			destroy(_ENV, true)
     		end
 	    end
 		-- custom behavior
 
-		enemy_ai(_𝘦𝘯𝘷)
+		enemy_ai(_ENV)
 
 	end
 	if paralize_t > 0 then
@@ -28,7 +28,7 @@ function enemy_upd(_𝘦𝘯𝘷)
 		x = initx
     	y = inity
 	else
-	restric_movement(_𝘦𝘯𝘷)
+	restric_movement(_ENV)
     end
 end
 
@@ -38,25 +38,25 @@ enemy = class:extend({
     xp_drop = 1,
     dmg = 20,
     paralize_t = 0,
-    init = function(_𝘦𝘯𝘷)
+    init = function(_ENV)
         if enemy_init != nil then
-            enemy_init(_𝘦𝘯𝘷)
+            enemy_init(_ENV)
         end
         age = 0
         initial_hp = hp
-        add(entities, _𝘦𝘯𝘷)
+        add(entities, _ENV)
     end,
     upd = enemy_upd,
     col = 7,
     sizey = 4, sizex = 4,
     enemy_ai = _noop,
-    destroy = function(_𝘦𝘯𝘷, die)
-        del(entities, _𝘦𝘯𝘷)
+    destroy = function(_ENV, die)
+        del(entities, _ENV)
         if die then
             sfx(41)
-            if is(_𝘦𝘯𝘷, bagel) then global.encount.BAGELS += 1
-            elseif is(_𝘦𝘯𝘷, baguette) then global.encount.BAGUETTES += 1
-            elseif is(_𝘦𝘯𝘷, loaf) then global.encount.LOAVES += 1 end
+            if is(_ENV, bagel) then global.encount.BAGELS += 1
+            elseif is(_ENV, baguette) then global.encount.BAGUETTES += 1
+            elseif is(_ENV, loaf) then global.encount.LOAVES += 1 end
             if (p != nil) then p.xp += xp_drop * p.xp_received end
         else
             sfx(23)
@@ -69,7 +69,7 @@ enemy = class:extend({
     dy = 0,
     c = 36,
     debug = drw_collision_box,
-    drwhp = function(_𝘦𝘯𝘷)
+    drwhp = function(_ENV)
 
         if hp < initial_hp then
             local barwidth = 13

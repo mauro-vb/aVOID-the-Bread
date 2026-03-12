@@ -7,10 +7,10 @@ transition = game_object:extend({
     fsize = 8,
     shrink = false,
     trans = smootherstep,
-    init = function(_𝘦𝘯𝘷)
-        sfx(42)
+    init = function(_ENV)
+        sfx(0)
         circles = {}
-        global.trans = _𝘦𝘯𝘷
+        global.trans = _ENV
         for i = 1, n do
             for j = 1, n do
                 local circle = { x = (i - 1) * 128 / (n - 1), y = (j - 1) * 128 / (n - 1), r = 0, c = rnd(cols) }
@@ -31,7 +31,7 @@ transition = game_object:extend({
         end
         shuffle(circles)
     end,
-    drw = function(_𝘦𝘯𝘷)
+    drw = function(_ENV)
         for circle in all(circles) do
             local r = circle.r
             local x = peek2(0x5f28) + circle.x

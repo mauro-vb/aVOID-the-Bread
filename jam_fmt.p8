@@ -3,43 +3,1671 @@ version 43
 __lua__
 -- a-VOID the Bread
 -- made by maurovb
-
-#include scripts/main.lua
-#include scripts/utils/utils.lua
-#include scripts/utils/sorty.lua
-#include scripts/utils/gfx_spriteshet.lua
+function ccolors()
+palt(0,false)
+palt(12,true)
+poke(0x5f2e,1)
+local cmap={
+}
+for c in all(cmap) do
+pal(c[1],c[2],1)
+end
+end
+global=_ENV
+_noop=function() end
+function _init()
+ccolors()
+maplims={minx=0,maxx=52*8,miny=0,maxy=32*8}
+startpx,startpy=maplims.maxx/2,maplims.maxy/2
+debug_on=false
+scene:load(ss)
+end
+function _update60()
+routines_upd()
+scene.current:upd()
+if trans!=nil then
+trans:upd()
+end
+end
+function _draw()
+scene.current:drw()
+if trans!=nil then
+trans:drw()
+end
+end
+function lerp(from,to,t)
+return from+(to-from)*t
+end
+function all_true(arr,cond)
+for e in all(arr) do
+if(not cond(e)) return false
+end
+return true
+end
+function rndrange(low,high)
+return low+rnd(high-low)
+end
+function upd_group(group)
+for e in all(group) do
+if e.upd then
+e:upd()
+end
+end
+end
+function drw_group(group)
+for e in all(group) do
+if e.drw then
+e:drw()
+end
+end
+end
+function shuffle(tbl)
+for i=#tbl,2,-1 do
+local j=flr(rnd(i)+1)
+tbl[i],tbl[j]=tbl[j],tbl[i]
+end
+return tbl
+end
+function split2d(s)
+local arr=split(s,"|",false)
+for k,v in pairs(arr) do
+arr[k]=split(v)
+end
+return arr
+end
+function chance(proba)
+proba=proba or .5
+return rnd()<proba
+end
+function contains(t,val)
+for v in all(t) do
+if v==val then
+return true
+end
+end
+return false
+end
+function disto(_ENV,t)
+local diffx=(x-t.x)/16
+local diffy=(y-t.y)/16
+local res=diffx*diffx+diffy*diffy
+return sqrt(res)*16
+end
+amap=split" 2,7,4,8,1,5,3,6"
+butarr=split"1,2,0,3,5,6,3,4,8,7,4,0,1,2,0"
+dirx=split"-1,1, 0,0,-0.7, 0.7,0.7,-0.7"
+diry=split" 0,0,-1,1,-0.7,-0.7,0.7, 0.7"
+function cobblefix(_ENV,dir)
+if lastdir!=dir and dir>=5 then
+x=flr(x)+.5
+y=flr(y)+.5
+end
+end
+function getdir(_ENV,target)
+local ddx=target.x-x
+local ddy=target.y-y
+local distance=sqrt(ddx*ddx+ddy*ddy)
+return{x=ddx/distance,y=ddy/distance}
+end
+function setdir(_ENV,target)
+local ddx=target.x-x
+local ddy=target.y-y
+local distance=sqrt(ddx*ddx+ddy*ddy)
+dx=ddx/distance
+dy=ddy/distance
+end
+function setcardinaldir(_ENV,p,nofix)
+ang=atan2(p.x-x,y-p.y)
+local si=flr((ang*8+.5)%8)+1
+local dir=amap[si]
+dx=dirx[dir]
+dy=diry[dir]
+if not nofix then
+cobblefix(_ENV,dir)
+end
+lastdir=dir
+end
+function collides(_ENV,b)
+if(y-sizey/2>b.y+b.sizey/2) return false
+if(b.y-b.sizey/2>y+sizey/2) return false
+if(x-sizex/2>b.x+b.sizex/2) return false
+if(b.x-b.sizex/2>x+sizex/2) return false
+return true
+end
+function mspr(s,x,y,fx,fy)
+fx=fx or false
+fy=fy or false
+sspr(
+s[1],s[2],
+s[3],s[4],
+x-s[5],y-s[6],
+s[3],s[4],
+fx,fy
+)
+end
+function cycanim(age,arr,spd,inv)
+local spd=spd or 1
+local t=age\spd
+if inv then t=#arr-1-t%#arr
+else t=t%#arr
+end
+return arr[t+1]
+end
+function sorty(arr)
+for i=1,#arr do
+local j=i-1
+local e=arr[i]
+while j>=1 and e.y<arr[j].y do
+arr[j+1]=arr[j]
+j-=1
+end
+arr[j+1]=e
+end
+end
+function hex2num(str)
+return("0x"..str)+0
+end
+function load_stored_gfx(gfx)
+index=0
+for i=1,#gfx,2 do
+cnt=hex2num(sub(gfx,i,i))
+local col=hex2num(sub(gfx,i+1,i+1))
+for j=1,cnt do
+sset((index)%128,flr((index)/128),col)
+index+=1
+end
+end
+end
+function restore_gfx()
+reload(0x0,0x0,0x2000)
+end
+story_gfx=
+"fcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfc9cf0f0f0306cf0f0f030fcbc10fefefe1e106c10fefefe1e10fcbc108e77fefe1e106c108efb8bfe10fcbc107e27161716171627fefe106c107e1bf7871bee10fcbc107e27161716171627fefe106c107e1bf7871bee10fcbc108e17161716171617fefe1e106c107e1b372017201720172027201730171bee10fcbc108e17161716171617fefe1e106c107e1b3710271027102710171017103710271bee10fcbc108e17161716171617fefe1e106c107e1b372017201710272027202710271bee10fcbc108e17161716171617fefe1e106c107e1b4710171027102710171017103710371bde10fcbc108e79fefe1e106c108e1b2720172017201710171017202710371bde10fcbc107e393f39fe1e707e106c108e1bf7871bde10fcbc106e395f39fe1f706e106c108e1b272027201720171017301720371bde10fcbc105e391f17102f101729fe3f605e106c108e1b27101710171027102710171017101710471bde10fcbc105e391f17102f101729ee10174f405e106c108e1b272027201710271017301720371bde10fcbc104e492f1c2f1c1f19fe10174f405e106c108e1b2710171017102710271017103710471bde10fcbc103e193e271c57194fae8f305e106c108e1b2710171017201720171017103720371bde10fcbc106e5712171c272e3f108e9f205e106c108e1bf7871bde10fcbc105eb7191e3f307e9f105e106c108e1bf7871bde10fcbc105e6712572e607e9f5e106c108e1bf7871bde10fcbc105e271e671e273e704eb04e106c108e1b2730172047202740371bde10fcbc105e271e671e274ef0703e106c108e1b5710271027103710771bde10fcbc105e271e671e275ef0702e106c108e1bf7871bde10fcbc105e271e671e276ef0701e106c108e1bf7871bde10fcbc105e171f1e671e277ef0601e106c108e1bf7871bde10fcbc105e2f1e671e2f9ef0401e106c108e1b572b372b271b272b171b271bde10fcbc106e1f1e602e1fbef0201e106c108e1b471b271b472b571b371bde10fcbc108e60eef0406c109e1bf7871bce10fcbc108e60eef0406c109e1bf7871bce10fcbc108e60eef0406c109e1b371017202710172037201710371bce10fcbc108e60eef0406c109e1b471057107710471bce10fcbc108e60eef0101e206c109e1bf7871bce10fcbcf0f0f0306cf0f0f030fcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfc8cf0f0f0306cf0f0f030fcbc10fe5e77fe4e106c10ce10f66610be10fcbc10fe4e27161716171627fe3e106c10be10f68610ae10fcbc10fe4e27161716171627fe3e106c10be1046f04610ae10fcbc10fe5e17161716171617fe4e106c10be103610f5103610ae10fcbc10fe5e17161716171617fe4e106c10be1026107514351b55102610ae10fcbc10fe5e17161716171617fe4e106c10be102610451b1514751b25102610ae10fcbc10fe5e17161716171617fe4e106c10be10261055141914651425102610ae10fcbc10fe5e79fe4e106c10be102610251415143914151425141925102610ae10fcbc10fe4e392f49fe3e106c10be102610351459141914151435102610ae10fcbc10fe3e394f49fe2e106c10be10363514191a191a14191a1924353610ae10fcbc10fe3e2917102f101739fe2e106c10be10463514191b391b1a1914254610ae10fcbc10fe2e3917102f101739fe2e106c10be20561514192a192a29145620ae10fcbc10fe2e396f39fe2e106c10be30f64630ae10fcbc10fe1e496f49fe1e106c10be70b670ae10fcbc10fe192e1987191e19fe1e106c10be1066b06610ae10fcbc10fe2e195712472e19fe106c10be2034e03430ae10fcbc10fe3ea719fe2e106c10be10161b29e61b19241610ae10fcbc10fe3e571247fe3e106c10bef0a0ae10fcbcf040374037f0406c10be10568456342610ae10fcbc10f434374437f434106c10be5014495430293420ae10fcbc10f4443714193719848224106c10be104614191b295436191b341610ae10fcbc10f4242d3f2d3f2df424106c10be50a4a0ae10ac1278127810d4422d3f2d3f2df424106c10be10f68610ae10ac127822681024926419141b191b491b19a284106c10bef0a0ae10ac12781218125810f4341b291b391b29f434106c10be10f58510ae10acf81810f454391b291bf444106c10be10f58510ae10acf81810f434193449241bf424106c10be10f58510ae10ac1278127810548244321b3219a49224106c10be10f58510ae10ac123812381238123810f4741bf484106c10be10f58510ae10ac322862283210f4f4f414106c10be10f58510ae10ac127e127ef0f0f0306cf0f0f030ac127e127efcfcfcfcfcfcfc7c127e127efcfcfcfcfcfcfc7c1e125e128efcfcfcfcfcfcfc7cfe1efcfcfcfcfcfcfc7c127e127efcfcfcfcfcfcfc7c123e123e122e124efc4cf0f0f030fcfcfc322e622e32fc4c10f8f8f81810fcfcfcfcfc5c10f8f8f81810fcfcfcfcfc5c10f8f8f81810fcfcfcfcfc5c10f8f8f81810fcfcfcfcfc5c109877f8f810fcfcfcfcfc5c108827161716171627f8e810fcfcfcfcfc5c108827161716171627f8529810fcfcfcfcfc5c109817161716171617e82249a210fcfcfcfcfc5c109817161716171617d822699210fcfcfcfcfc5c109817161716171617d812799210fcfcfcfcfc5c109817161716171617c814191b591b198210fcfcfcfcfc5c109879c814192b392b198210fcfcfcfcfc5c108889c814192b292b29424410fcfcfcfcfc5c1078792fc814591b497410fcfcfcfcfc5c10787917101fb814a97410fcfcfcfcfc5c10787917102fa814791b297410fcfcfcfcfc5c1078793fb814191b191b292b297410fcfcfcfcfc5c1078793fb814192b193b397410fcfcfcfcfc5c10681918692fc812a97210fcfcfcfcfc5c106819186917e8f22210fcfcfcfcfc5c106819186927f8f810fcfcfcfcfc5c1088273947f8e810fcfcfcfcfc5c1078373947f8e810fcfcfcfcfc5c1078473947f8d810fcfcfcfcfc5c10686719271837f8c810fcfcfcfcfc5c106827186728371f6df84810fcfcfcfcfc5c106827186748171fcdd810fcfcfcfcfc5c10682f1860c86dd810fcfcfcfcfc5c108880f8f810fcfcfcfcfc5c1088302830f8f810fcfcfcfcfc5cf0f0f030fcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfc"
 #include data/myspr.txt
-#include data/stats.lua
-#include scripts/class.lua
-#include scripts/game_object.lua
-#include scripts/scene.lua
-#include scripts/utils/tween.lua
-#include scripts/entities/enemy.lua
-#include scripts/entities/loaf.lua
-#include scripts/entities/bagel.lua
-#include scripts/entities/baguette.lua
-#include scripts/entities/bun.lua
-
-
-#include scripts/entities/oven.lua
-
-#include scripts/entities/camera.lua
-#include scripts/entities/player.lua
-
-#include scripts/scenes/game.lua
-#include scripts/scenes/start_screen.lua
-#include scripts/scenes/end_screen.lua
-
-
-#include scripts/particles/particle.lua
-#include scripts/particles/player.lua
-
-#include scripts/entities/game_ui.lua
-#include scripts/entities/upgrade_ui.lua
-#include scripts/scenes/transition.lua
-#include scripts/scenes/story.lua
-
-
+enstats={
+split2d"15,.2|7,220|8,.12|35,650|9,.2",
+split2d"18,.2|12,220|10,.12|42,600|12,.22",
+split2d"20,.22|15,200|12,.14|48,550|15,.25",
+split2d"23,.25|18,180|15,.16|55,500|18,.30",
+split2d"27,.27|22,165|18,.18|63,455|22,.33",
+split2d"30,.3|26,150|22,.2|72,410|26,.35",
+split2d"35,.32|32,135|26,.21|82,375|30,.37",
+split2d"40,.35|38,120|30,.23|92,340|34,.4",
+split2d"47,.37|45,110|35,.25|103,300|38,.41",
+split2d"53,.4|50,100|38,.27|112,260|42,.43",
+split2d"57,.41|53,95|42,.28|118,220|46,.44",
+split2d"60,.43|55,90|45,.3|125,180|50,.45",
+}
+class=setmetatable({
+ancestors={},
+extend=function(_ENV,tbl)
+tbl=tbl or{}
+tbl.__index=tbl
+tbl.ancestors={}
+for a in all(_ENV.ancestors) do
+add(tbl.ancestors,a)
+end
+add(tbl.ancestors,_ENV)
+setmetatable(tbl,{
+__index=_ENV,
+__call=tbl.__call or function(_ENV,tbl)
+return _ENV:new(tbl)
+end
+})
+return tbl
+end,
+new=function(_ENV,tbl)
+tbl=tbl or{}
+setmetatable(tbl,_ENV)
+tbl.class=_ENV
+tbl:init()
+return tbl
+end,
+is=function(_ENV,klass)
+return _ENV.class==klass or count(ancestors,klass)>0
+end,
+init=_noop
+},{__index=_ENV})
+class.__index=class
+game_object=class:extend({
+init=_noop,
+upd=_noop,
+drw=_noop,
+destroy=_noop,
+})
+scene=game_object:extend({
+load=function(_ENV,new_scene)
+if new_scene!=current then
+current=new_scene
+current:init()
+end
+end
+})
+routines={}
+function tween_wait(f,callback)
+callback=callback or _noop
+local wait=function()
+for i=1,f do
+yield()
+end
+end
+return{animation=wait,callback=callback}
+end
+function tween(obj,k,v,f,transition,callback,pausable)
+local initial_v=obj[k]
+transition=transition or linear
+callback=callback or _noop
+animation=function()
+for i=1,f do
+obj[k]=lerp(initial_v,v,transition(i/f))
+yield()
+end
+end
+return{animation=animation,callback=callback,pausable=pausable}
+end
+function tween_factory(obj,k,v,f,transition,callback,pausable)
+return function() return tween(obj,k,v,f,transition,callback,pausable) end
+end
+function dotween(obj,k,v,f,transition,callback,pausable)
+local tw=tween(obj,k,v,f,transition,callback)
+local co=cocreate(tw.animation)
+add(routines,{co=co,callback=tw.callback,pausable=pausable})
+end
+function chaintweens(steps,final_callback,pausable)
+final_callback=final_callback or _noop
+local function chain()
+for step in all(steps) do
+if type(step)=="function"or not step[1] then
+step={step}
+end
+local cos={}
+for tw in all(step) do
+tw=type(tw)=="function"and tw() or tw
+add(cos,{
+co=cocreate(tw.animation),
+callback=tw.callback,
+pausable=pausable
+})
+end
+local running=true
+while running do
+running=false
+for item in all(cos) do
+if costatus(item.co)!="dead"then
+running=true
+assert(coresume(item.co))
+end
+end
+if running then yield() end
+end
+for item in all(cos) do
+item.callback()
+end
+end
+final_callback()
+end
+add(routines,{
+co=cocreate(chain),
+callback=_noop,
+pausable=pausable
+})
+end
+function routines_upd()
+for routine in all(routines) do
+if costatus(routine.co)=="dead"then
+routine.callback()
+del(routines,routine)
+else
+assert(coresume(routine.co))
+end
+end
+end
+function linear(t)
+return t
+end
+function smoothstep(t)
+return t*t*(3-2*t)
+end
+function smootherstep(t)
+return t*t*t*(t*(t*6-15)+10)
+end
+function overshoot(t)
+if(t<.5) then
+return(2.7*8*t*t*t-1.7*4*t*t)/2
+else
+t-=1
+return 1+(2.7*8*t*t*t+1.7*4*t*t)/2
+end
+end
+function enemy_upd(_ENV)
+age+=1
+local initx,inity=x,y
+if state=="spawning"then
+if spawn_delay>0 then
+spawn_delay-=1
+else state="active"
+end
+elseif state=="active"then
+if not dummy then
+if collides(_ENV,p) do
+destroy(_ENV,false)
+return
+end
+if hp<=0 then
+destroy(_ENV,true)
+end
+end
+enemy_ai(_ENV)
+end
+if paralize_t>0 then
+paralize_t-=1
+x=initx
+y=inity
+else
+restric_movement(_ENV)
+end
+end
+enemy=class:extend({
+state="active",
+dummy=false,
+xp_drop=1,
+dmg=20,
+paralize_t=0,
+init=function(_ENV)
+if enemy_init!=nil then
+enemy_init(_ENV)
+end
+age=0
+initial_hp=hp
+add(entities,_ENV)
+end,
+upd=enemy_upd,
+col=7,
+sizey=4,sizex=4,
+enemy_ai=_noop,
+destroy=function(_ENV,die)
+del(entities,_ENV)
+if die then
+sfx(41)
+if is(_ENV,bagel) then global.encount.BAGELS+=1
+elseif is(_ENV,baguette) then global.encount.BAGUETTES+=1
+elseif is(_ENV,loaf) then global.encount.LOAVES+=1 end
+if(p!=nil) then p.xp+=xp_drop*p.xp_received end
+else
+sfx(23)
+enhurt(p)
+if(p!=nil) then p.hp-=dmg*p.dmg_received end
+end
+end,
+x=64,y=64,
+dx=0,
+dy=0,
+c=36,
+debug=drw_collision_box,
+drwhp=function(_ENV)
+if hp<initial_hp then
+local barwidth=13
+local offy=8
+local progress=lerp(0,barwidth,mid(0,hp/initial_hp,1))
+local bx=x-barwidth/2
+line(bx,y+offy,bx+barwidth,y+offy,15)
+line(bx,y+offy,bx+progress,y+offy,11)
+end
+end
+})
+function loaf_ai(_ENV)
+timer-=1
+if(p==nil) return nil
+setcardinaldir(_ENV,p,move_speed<=.3)
+if timer<=0 then
+rndspd=rndrange(-.1,.1)
+timer=rndrange(60,90)
+end
+x+=move_speed*dx
+y+=move_speed*dy
+end
+function loaf_drw(_ENV)
+mspr(cycanim(age,anim,6),x,y,p.x>x)
+drwhp(_ENV)
+end
+loaf=enemy:extend({
+timer=0,
+anim={myspr[21],myspr[22],myspr[23],myspr[24]},
+drw=loaf_drw,
+enemy_ai=loaf_ai,
+enemy_init=function(_ENV)
+hp=enstats[enstats_i][1][1]
+move_speed=enstats[enstats_i][1][2]
+end,
+})
+function bagel_ai(_ENV)
+if(p==nil) return nil
+setdir(_ENV,p)
+local pdist=disto(_ENV,p)
+local dist_thresh=50
+if pdist>dist_thresh and last_pdist<dist_thresh and abs(rotation_dir)>.5 then
+dotween(_ENV,"rotation_dir",-sgn(rotation_dir),90,quad)
+else
+local tangent_x=-dy*rotation_dir
+local tangent_y=dx*rotation_dir
+x+=move_speed*dx+orbit_speed*tangent_x
+y+=move_speed*dy+orbit_speed*tangent_y
+end
+last_pdist=pdist
+if x>=maplims.maxx or x<=0 or y>=maplims.maxy or y<=0 then
+rotation_dir*=-1
+end
+end
+function bagel_drw(_ENV)
+ovalfill(x-7,y+1,x+5,y+6,2)
+mspr(sprarr,x,y)
+drwhp(_ENV)
+local eyespos=cycanim(age,eyepositions,10,sgn(rotation_dir)==-1)
+for pos in all(eyespos) do
+pset(x+pos.x,y+pos.y,x<p.x and 11 or 0)
+pset(1+x+pos.x,y+pos.y,x<p.x and 0 or 11)
+end
+end
+bagel=enemy:extend({
+rotation_timer=0,
+eyepositions={
+{{x=0,y=2},{x=-3,y=2}},
+{{x=2,y=1},{x=4,y=0}},
+{},
+{{x=-7,y=0},{x=-5,y=1}},
+},
+sprarr=myspr[25],
+drw=bagel_drw,
+enemy_init=function(_ENV)
+hp=enstats[enstats_i][3][1]
+move_speed=enstats[enstats_i][3][2]
+orbit_speed=move_speed*3
+rotation_dir=chance() and 1 or-1
+end,
+last_pdist=100,
+enemy_ai=bagel_ai
+})
+function baguette_dash(_ENV)
+dashing=true
+local chargex,chargey=(-dirtop.x*8),(-dirtop.y*8)
+local chargef=20
+local maxforce=60
+local dashforce=mid(15,disto(_ENV,p),maxforce)+rndrange(-5,5)
+local dashf=mid(40,dashspd-10*(dashforce/maxforce),dashspd)
+local dashx=dirtop.x*dashforce
+local dashy=dirtop.y*dashforce
+chaintweens({
+{
+tween_factory(_ENV,"x",x+chargex,chargef,smoothstep),
+tween_factory(_ENV,"y",y+chargey,chargef,smoothstep)
+},
+{
+tween_factory(_ENV,"x",x+dashx,dashf,overshoot),
+tween_factory(_ENV,"y",y+dashy,dashf,overshoot)
+}
+},function() dashing=false end,true)
+end
+function baguette_upd_visuals(_ENV)
+local ang=atan2(p.x-x,p.y-y)
+if(ang<.45 and ang>.3) or(ang<.95 and ang>.8) then
+sprarr=sprarrs[1]
+flipx=true
+elseif(ang<.70 and ang>.55) or(ang<.2 and ang>.05) then
+sprarr=sprarrs[1]
+flipx=false
+elseif(ang>.2 and ang<.3) or(ang>.7 and ang<.8) then
+sprarr=sprarrs[2]
+flipx=p.x>x
+else
+sprarr=sprarrs[3]
+flipx=p.x>x
+end
+end
+function baguette_ai(_ENV)
+if(p==nil) return nil
+if not dashing then
+baguette_upd_visuals(_ENV)
+end
+dirtop=getdir(_ENV,p)
+if timer>=0 then
+if not(paralize_t>0) then
+timer-=1
+end
+else
+if disto(_ENV,p)<64 and collides(_ENV,scene.cam) then
+timer=waitt+rnd(variationt)
+baguette_dash(_ENV)
+else
+setcardinaldir(_ENV,p)
+x+=move_speed*dx
+y+=move_speed*dy
+end
+end
+end
+function baguette_drw(_ENV)
+mspr(sprarr,x,y,flipx)
+drwhp(_ENV)
+end
+baguette=enemy:extend({
+dashspd=60,
+move_speed=.5,
+sprarr=myspr[26],
+sprarrs={myspr[26],myspr[27],myspr[28]},
+enemy_ai=baguette_ai,
+drw=baguette_drw,
+timer=120,
+ai_state="wait",
+variationt=50,
+dashing=false,
+enemy_init=function(_ENV)
+hp=enstats[enstats_i][3][1]
+waitt=enstats[enstats_i][2][2]
+end,
+})
+function bun_ai(_ENV)
+if(p==nil) return nil
+setdir(_ENV,p)
+local pdist=disto(_ENV,p)
+local dist_thresh=30
+if pdist>dist_thresh and last_pdist<dist_thresh and abs(rotation_dir)>.5 then
+dotween(_ENV,"rotation_dir",-sgn(rotation_dir),90,quad)
+else
+local tangent_x=-dy*rotation_dir
+local tangent_y=dx*rotation_dir
+x+=move_speed*dx+orbit_speed*tangent_x
+y+=move_speed*dy+orbit_speed*tangent_y
+end
+last_pdist=pdist
+if x>=maplims.maxx or x<=0 or y>=maplims.maxy or y<=0 then
+rotation_dir*=-1
+end
+end
+function bun_drw(_ENV)
+mspr(sprarr,x,y)
+drwhp(_ENV)
+for i=1,2 do
+local oy=p.y>y and 3 or 2
+local ox=p.x>x and-2 or-3
+if i==2 then ox+=3 end
+pset(x+ox,y+oy,0)
+end
+end
+bun=enemy:extend({
+rotation_dir=1,
+sprarr=myspr[29],
+drw=bun_drw,
+enemy_init=function(_ENV)
+hp=enstats[enstats_i][5][1]
+move_speed=enstats[enstats_i][5][2]
+orbit_speed=move_speed*1.2
+end,
+last_pdist=100,
+enemy_ai=bun_ai
+})
+function oven_spawn(_ENV)
+sfx(59)
+for i=1,mid(1,difficulty/2,10) do
+local en=rnd(enemies)
+if#entities<300 then
+en({
+x=x+rndrange(-6,6),
+y=y+10+rndrange(-4,4),
+})
+end
+end
+sprarr=myspr[30]
+end
+function oven_upd(_ENV)
+if age%spawn_rate==0 then
+sprarr=myspr[31]
+spwn_timer=30
+end
+if sprarr==myspr[31] then
+if spwn_timer<=0 then
+oven_spawn(_ENV)
+else
+spwn_timer-=1
+end
+end
+if hp<=0 then
+destroy(_ENV)
+end
+end
+oven=enemy:extend({
+age=0,
+state="active",
+size="small",
+enemies={bun,baguette,loaf,bagel},
+xp_drop=3,
+drw=function(_ENV)
+age+=1
+mspr(sprarr,x,y)
+drwhp(_ENV)
+end,
+upd=oven_upd,
+c=86,
+destroy=function(_ENV)
+del(entities,_ENV)
+del(ovens,_ENV)
+if(p!=nil) then p.xp+=xp_drop end
+global.encount.OVENS+=1
+end,
+drw_indicator=function(_ENV)
+if not collides(_ENV,cam) then
+local margin=4
+local sx=mid(cam.x-64+margin,x,cam.x+64-margin)
+local sy=mid(cam.y-64+margin,y,cam.y+64-margin)
+local size=flr(lerp(1,3,1-disto(_ENV,p)/300))
+rectfill(sx-size,sy-size,sx+size,sy+size,(sprarr==myspr[31] and sin(age/10)>-.5) and 9 or 6)
+if size>=1 then
+rect(sx-size,sy-size,sx+size,sy+size,5)
+end
+end
+end,
+enemy_init=function(_ENV)
+hp=enstats[enstats_i][4][1]
+spawn_rate=enstats[enstats_i][4][2]
+oven_spawn(_ENV)
+sfx(19)
+if size=="small"then
+sizex,sizey=16,16
+sprarr=myspr[30]
+end
+end
+})
+mycam=game_object:extend({
+deadz=24,
+sizex=128,sizey=128,
+owner=nil,
+init=function(_ENV)
+minx=maplims.minx;maxx=maplims.maxx
+miny=maplims.miny;maxy=maplims.maxy
+x=owner.x
+y=owner.y
+end,
+upd=function(_ENV)
+if(owner==nil) return
+local ox,oy=owner.x,owner.y
+if abs(ox-x)>deadz then
+x=mid(minx+64,ox-sgn(ox-x)*deadz,maxx-64)
+end
+if abs(oy-y)>deadz then
+y=mid(miny+64,oy-sgn(oy-y)*deadz,maxy-64)
+end
+camera(x-64,y-64)
+end,
+})
+function player_dash(_ENV)
+if btnp(❎) and can_dash then
+sfx(28)
+dashing=true
+can_dash=false
+local trans=quad
+if dx==0 and dy==0 then
+if anim==anims.l_idle then dx=-1;dy=0
+elseif anim==anims.r_idle then dx=1;dy=0
+elseif anim==anims.d_idle then dx,dy=0,1
+elseif anim==anims.u_idle then dx,dy=0,-1 end
+end
+local dashx,dashy=dx*dashforce,dy*dashforce
+local dashf=10
+dotween(_ENV,"x",x+dashx,dashf,trans)
+dotween(_ENV,"y",y+dashy,dashf,trans,function() dashing=false;dasht=dash_cd end)
+else
+if dasht>0 then
+dasht-=1
+else
+can_dash=has_dash
+end
+end
+end
+function player_hit(_ENV)
+local function get_area(_ENV)
+local area={}
+area.y=y-4
+if facing_dir=="u"then area.y=y-hitlen/2
+elseif facing_dir=="d"then area.y=y+hitlen/2 end
+area.x=x
+if facing_dir=="l"then area.x=x-hitlen/2
+elseif facing_dir=="r"then area.x=x+hitlen/2 end
+if facing_dir=="u"or facing_dir=="d"then
+area.sizex=hitwid
+area.sizey=hitlen
+else
+area.sizex=hitlen
+area.sizey=hitwid
+end
+rectfill(area.x-area.sizex/2,area.y-area.sizey/2,area.x+area.sizex/2,area.y+area.sizey/2,12)
+area.hor=facing_dir=="l"or facing_dir=="r"
+area.dir=facing_dir
+return area
+end
+local area=get_area(_ENV)
+hit_particles(area)
+for en in all(entities) do
+if(en:is(enemy) or en:is(oven)) and collides(area,en) then
+if lifesteal then hp+=.5*en.hp end
+if paralize then en.paralize_t=paralize_t end
+en.hp-=hit_dmg
+sfx(28)
+enhit(en)
+end
+end
+sfx(17)
+end
+function player_hit_upd(_ENV)
+if hitting and(age\hitspd)%#anim+1==#anim then
+hitting=false
+hit(_ENV)
+change_anim(_ENV,facing_dir.."_idle",facing_dir=="l",idlespd)
+end
+if hit_t>0 then
+hit_t-=1
+if hit_wait_t!=hit_wait then hit_wait_t=hit_wait end
+else
+if input_dir==0 then
+if hit_wait_t>0 then
+hit_wait_t-=1
+else
+hitting=true
+hit_t=hit_cd
+end
+end
+end
+end
+function player_move(_ENV)
+if(dashing) return
+input_dir=0
+if btn(⬅️) then input_dir+=1 end
+if btn(➡️) then input_dir+=2 end
+if btn(⬆️) then input_dir+=4 end
+if btn(⬇️) then input_dir+=8 end
+input_dir=butarr[input_dir]
+dx=dirx[input_dir];dy=diry[input_dir]
+cobblefix(_ENV,input_dir)
+local nx,ny=x+dx*mv_spd,y+dy*mv_spd
+x=nx;y=ny
+if input_dir!=0 then
+if step_timer>0 then
+step_timer-=1
+else
+sfx(age%2==0 and 37 or 38)
+step_timer=20
+end
+end
+player_dash(_ENV)
+restric_movement(_ENV)
+end
+function change_anim(_ENV,name,fx,spd)
+if anim!=anims[name] then
+age=0
+spd=spd or 10
+aspd=spd
+anim=anims[name]
+flipx=fx
+facing_dir=name[1]
+end
+end
+function player_anim(_ENV)
+if hitting then
+if anim==anims.l_idle then
+change_anim(_ENV,"l_hit",true,hitspd)
+elseif anim==anims.r_idle then
+change_anim(_ENV,"r_hit",false,hitspd)
+elseif anim==anims.u_idle then
+change_anim(_ENV,"u_hit",false,hitspd)
+elseif anim==anims.d_idle then
+change_anim(_ENV,"d_hit",false,hitspd)
+end
+else
+if(lastdir==0) return
+if input_dir==1 or input_dir==2 or input_dir>=5 then
+local isleft=sgn(dx)==-1
+local side=isleft and"l"or"r"
+change_anim(_ENV,side.."_run",isleft,7)
+elseif input_dir==3 then
+change_anim(_ENV,"u_run")
+elseif input_dir==4 then
+change_anim(_ENV,"d_run",false)
+else
+if(lastdir==3) then
+change_anim(_ENV,"u_idle",false,idlespd)
+elseif(lastdir==4) then
+change_anim(_ENV,"d_idle",false,idlespd)
+else
+local isleft=lastdir==1 or lastdir==5
+local side=isleft and"l"or"r"
+change_anim(_ENV,side.."_idle",isleft,idlespd)
+end
+end
+end
+end
+function player_level_up(_ENV)
+sfx(14)
+local function get_upgrade(prev_upgs)
+local new_upg=nil
+local upg_type
+repeat
+new_upg=rnd(upgrades)
+until new_upg
+and new_upg:valid()
+and not contains(prev_upgs,new_upg)
+return new_upg
+end
+local ups={}
+local upg
+for i=1,3 do
+upg=get_upgrade(ups)
+add(ups,upg)
+end
+global.ui=upgrade_ui({upgrades=ups})
+end
+function player_upd_xp(_ENV)
+local xp_required=level>#level_ups and level_ups[#level_ups] or level_ups[level]
+if xp>=xp_required then
+xp-=xp_required
+level+=1
+player_level_up(_ENV)
+end
+end
+function player_upd(_ENV)
+age+=1
+player_move(_ENV)
+player_hit_upd(_ENV)
+player_anim(_ENV,input_dir)
+player_upd_xp(_ENV)
+hp=min(hp,maxhp)
+lastdir=input_dir
+end
+function player_drw(_ENV)
+ovalfill(x-4,y+3,x+4,y+6,2)
+sprarr=cycanim(age,anim,aspd)
+mspr(sprarr,x,y,flipx)
+if debug_on then
+debug(_ENV)
+end
+end
+function player_debug(_ENV)
+drw_collision_box(_ENV)
+print(hitlen,x,y-20,0)
+end
+function player_init(_ENV)
+butarr[0]=0
+anim=anims.d_idle
+hit_t=hit_cd
+hit_wait_t=hit_wait
+add(entities,_ENV)
+end
+player=game_object:extend({
+mv_spd=.8,
+dx=0,
+dy=0,
+sizex=6,
+sizey=10,
+anims={
+d_idle={myspr[2],myspr[5]},
+l_idle={myspr[3],myspr[47]},
+r_idle={myspr[1],myspr[34]},
+u_idle={myspr[4],myspr[17]},
+d_run={myspr[5],myspr[6],myspr[7],myspr[8]},
+r_run={myspr[9],myspr[10],myspr[11],myspr[12]},
+l_run={myspr[13],myspr[14],myspr[15],myspr[16]},
+u_run={myspr[17],myspr[18],myspr[19],myspr[20]},
+d_hit={myspr[35],myspr[36],myspr[37],myspr[37]},
+u_hit={myspr[38],myspr[39],myspr[40],myspr[40]},
+r_hit={myspr[41],myspr[42],myspr[43],myspr[43]},
+l_hit={myspr[44],myspr[45],myspr[46],myspr[46]},
+},
+idlespd=12,
+hitspd=6,
+age=0,
+input_dir=0,
+dash_cd=200,
+dasht=0,
+has_dash=false,
+can_dash=false,
+dashforce=28,
+upgrades={
+{trigger=function() p.has_dash=true end,valid=function() return not p.has_dash end,name="get a dash ヌえ🅾️",icon=myspr[51]},
+{trigger=function() p.dash_cd-=50 end,valid=function() return p.has_dash and p.dash_cd>80 end,name="reduce dash cooldown",icon=myspr[51]},
+{trigger=function() p.hit_cd=mid(5,p.hit_cd-20,100) end,valid=function() return p.hit_cd>10 end,name="reduce hit cooldown",icon=myspr[50]},
+{trigger=function() p.hitlen=mid(25,p.hitlen*1.5,60);p.hitwid=mid(15,p.hitwid*1.5,35) end,valid=function() return p.hitlen<60 end,name="increase reach",icon=myspr[52]},
+{trigger=function() p.hit_dmg+=5 end,valid=function() return true end,name="increase damage",icon=myspr[49]},
+{trigger=function() p.xp_received*=1.5 end,valid=function() return p.xp_received<100 and p.level>10 end,name="receive more xp",icon=myspr[49],repeatable=true},
+{trigger=function() p.hp=mid(1,p.hp+.35*p.maxhp,p.maxhp) end,valid=function() return p.hp!=p.maxhp end,name="heal",icon=myspr[53]},
+{trigger=function() p.maxhp*=1.2 end,valid=function() return true end,name="increase max hp",icon=myspr[53]},repeatable=true,
+{trigger=function() p.lifesteal=true end,valid=function() return not p.lifesteal and p.level>10 end,name="lifesteal",icon=myspr[52]},
+{trigger=function() p.dmg_received*=.75 end,valid=function() return p.dmg_received>.3 end,name="reduce received damage",icon=myspr[48]},
+{trigger=function() p.paralize=true end,valid=function() return not p.paralize end,name="stun hit enemies",icon=myspr[52]},
+{trigger=function() p.paralize_t=mid(1,p.paralize_t+30,120) end,valid=function() return p.paralize and p.paralize_t<120 end,name="longer stun",icon=myspr[50]},
+},
+step_timer=20,
+hit_cd=100,
+hitting=false,
+hit_wait=10,
+hitlen=25,
+hitwid=12,
+hit_dmg=7,
+hit=player_hit,
+hp=100,
+maxhp=100,
+lifesteal=false,
+paralize=false,
+paralize_t=25,
+dmg_received=1,
+xp_received=1,
+xp=0,
+level=1,
+level_ups=split"3,3,4,4,4,5,5,5,5,8,9,10,10,10,10,20,20,30,50,60,70,80,100,150,200,300,400,500,750,1000",
+upd=player_upd,
+drw=player_drw,
+init=player_init,
+debug=player_debug,
+})
+function spawn_oven()
+local oven_pos
+local function checkcol(ovenpos)
+for oven in all(ovens) do
+if collides(ovenpos,oven) then return true end
+end
+if ovenpos.x-ovenpos.sizex/2<maplims.minx then return true end
+if ovenpos.x+ovenpos.sizex/2>maplims.maxx then return true end
+if ovenpos.y-ovenpos.sizey/2<maplims.miny then return true end
+if ovenpos.y+ovenpos.sizey/2>maplims.maxy then return true end
+return collides(ovenpos,scene.cam)
+end
+repeat
+oven_pos={
+x=rndrange(16,maplims.maxx-16),
+y=rndrange(16,maplims.maxy-16),
+sizex=16,
+sizey=16
+}
+until not checkcol(oven_pos)
+add(ovens,oven({
+x=oven_pos.x,
+y=oven_pos.y
+}))
+end
+function restric_movement(_ENV)
+x=mid(0,x,maplims.maxx)
+y=mid(0,y,maplims.maxy)
+end
+function game_loop(_ENV)
+difficulty=max(difficulty,flr(t/1500)+flr(p.level/2.5))
+local novens=mid(2,difficulty/5,4)
+local oven_spawn_rate=flr(mid(600,900-difficulty*20+novens*180,1200))
+global.enstats_i=mid(1,ceil(difficulty/3),#enstats)
+if t%oven_spawn_rate==0 then
+for n=1,novens do
+if#ovens==0 then spawn_oven() end
+if#ovens<8 then
+spawn_oven()
+end
+end
+end
+if p.hp<=0 then end_game(_ENV) end
+end
+function end_game(_ENV)
+over=true
+transition({new_scene=end_screen})
+end
+function game_init(_ENV)
+global.enstats_i=1
+global.difficulty=0
+over=false
+restore_gfx()
+t=0
+global.encount={BAGELS=0,BAGUETTES=0,LOAVES=0,OVENS=0}
+global.entities={}
+global.p=player({x=startpx,y=startpy})
+global.parts={}
+global.ui=game_ui()
+global.cam=mycam({owner=p})
+global.paused=false
+global.ovens={}
+spawn_oven(true)
+spawn_oven(true)
+_upd=game_upd
+_drw=game_drw
+end
+function game_upd(_ENV)
+if(over) return
+ui:upd()
+if(paused) return
+t+=1
+upd_group(entities)
+upd_group(parts)
+sorty(entities)
+cam:upd()
+game_loop(_ENV)
+end
+function game_drw(_ENV)
+cls(7)
+map()
+drw_group(entities)
+drw_group(attacks)
+if(over) return
+drw_group(parts)
+ui:drw()
+end
+game=scene:extend({
+init=game_init,
+upd=game_upd,
+drw=game_drw,
+})
+function ss_init(_ENV)
+global.cam=nil
+pressed=false
+_upd=ss_upd
+_drw=ss_drw
+global.cam=nil
+x,y=startpx,startpy
+mapx,mapy=rndrange(0,6),0
+camera(startpx-64,startpy-64)
+end
+function ss_upd(_ENV)
+if(pressed) return
+if btnp(🅾️) or btnp(❎) then
+pressed=true
+transition({new_scene=story})
+end
+end
+function ss_drw(_ENV)
+map(mapx,mapy)
+print("\^w\^t\^o040 A-VOID \nTHE BREAD",x-35,y-30,15)
+print("\^o040PRESS 🅾️ / ❎",x-28,y,15)
+end
+ss=scene:extend({
+init=ss_init,
+upd=ss_upd,
+drw=ss_drw,
+})
+function end_init(_ENV)
+pressed=false
+_upd=end_upd
+_drw=end_drw
+x=cam.x
+y=cam.y
+end
+function end_upd(_ENV)
+if(pressed) return
+if btnp(❎) then
+pressed=true
+transition({new_scene=game})
+elseif btnp(🅾️) then
+pressed=true
+transition({new_scene=ss})
+end
+end
+function end_drw(_ENV)
+map()
+local strs={"BAGELS","BAGUETTES","LOAVES","OVENS"}
+for e=1,#strs do
+local tmp=strs[e]
+local verb=tmp=="OVENS"and"DESTROYED "or"TOASTED "
+print("\^o040"..verb..tostr(encount[tmp]).." VOID "..tmp,x-45,20+y+8*e,15)
+end
+print("\^w\^t\^o040GAME OVER",x-35,y-30,15)
+print("\^o040rEACHED LVL "..tostr(p.level),x-28,y-15,15)
+print("\^o040❎ AGAIN / 🅾️ QUIT",x-34,y,15)
+end
+end_screen=scene:extend({
+init=end_init,
+upd=end_upd,
+drw=end_drw,
+})
+function dopart(_ENV)
+if wait then
+wait-=1
+if wait<=0 then
+wait=nil
+if parentp then
+x=parentp.x;y=parentp.y
+if offsetx then
+x+=offsetx
+end
+if offsety then
+y+=offsety
+end
+end
+end
+else
+age=age or 0
+c=c or ctab[i]
+if age==0 then
+ox=x
+oy=y
+size=size or 1
+ctabv=ctabv or 0
+tospd=tospd or 1
+elseif freezeat==age then
+global.freeze_frames=freezeframes
+end
+age+=1
+if age<=0 then return end
+if ctab then
+local ci=(age+ctabv)/maxage
+ci=mid(1,flr(1+ci*#ctab),#ctab)
+c=ctab[ci]
+end
+if tox then
+x+=(tox-x)/(4/tospd)
+end
+if toy then
+y+=(toy-y)/(4/tospd)
+end
+if rotspd then
+rota=rota or 0
+cdist=cdist or 8
+rota+=rotspd
+x=cx+sin(rota)*cdist
+y=cy+cos(rota)*cdist
+end
+if sx then
+if cx then
+cx+=sx
+else
+x+=sx
+end
+if tox then
+tox+=sx
+end
+if drag then
+sx*=drag
+end
+end
+if sy then
+if cy then
+cy+=sy
+else
+y+=sy
+end
+if toy then
+toy+=sy
+end
+if drag then
+sy*=drag
+end
+end
+if tosize then
+size+=(tosize-size)/(5/tospd)
+end
+if incrsize then
+size+=incrsize
+end
+if age>=maxage or size<1 then
+if onendf then onendf() end
+if onend=="return"then
+maxage+=32000
+tox=ox
+toy=oy
+tosize=nil
+incrsize=-0.3
+elseif onend=="fade"then
+maxage+=32000
+tosize=nil
+incrsize=-0.1-rnd(0.3)
+else
+del(parts,_ENV)
+end
+ctab=nil
+onend=nil
+end
+end
+end
+particle=game_object:extend({
+age=0,
+maxage=0,
+x=63,
+y=63,
+size=1,
+ctabv=nil,
+spd=1,
+upd=dopart,
+init=function(_ENV)
+ox=x
+oy=y
+add(parts,_ENV)
+if pinit then pinit(_ENV) end
+end,
+drw=function(_ENV)
+if(wait) return
+pdrw(_ENV)
+end
+})
+function tweenp_init(_ENV)
+add(global.parts,_ENV)
+if tweens then
+chaintweens(tweens,function()
+del(global.parts,_ENV)
+end)
+end
+end
+tweenp=particle:extend({
+upd=_noop,
+init=tweenp_init,
+})
+function drw_circle(_ENV)
+if border then
+fillp(0xffff)
+circfill(x,y,size/2+1,c)
+fillp(0x0)
+end
+circfill(x,y,size/2,c)
+end
+circlep=particle:extend({
+size=1,
+border=false,
+pdrw=drw_circle
+})
+rectp=particle:extend({
+iwidth=2,
+iheight=1,
+border=false,
+pinit=function(_ENV)
+width=iwidth*size
+height=iheight*size
+end,
+upd=function(_ENV)
+width=size*iwidth
+height=size*iheight
+dopart(_ENV)
+end,
+drw=function(_ENV)
+local w,h=width/2,height/2
+rectfill(x-w,y-h,x+w,y+h,c)
+if border then
+fillp(0xffff)
+rect(x-w,y-h,x+w,y+h,c)
+fillp(0x0)
+end
+end
+})
+function hit_particles(a)
+if debug_on then
+particle:new({
+x=a.x,
+y=a.y,
+sizex=a.sizex,
+sizey=a.sizey,
+c=12,
+pdrw=function(_ENV)
+rectfill(x-sizex/2,y-sizey/2,x+sizex/2,y+sizey/2,c)
+end,
+maxage=20,
+})
+end
+local n=mid(20,a.sizex*a.sizey/10,150)
+for i=1,n do
+local t=i/(n+1)
+local spread=.4
+local angle=lerp(-spread,spread,t)
+local reach_mult=a.hor and a.sizex/4 or a.sizey/4
+local arc_r=a.hor and a.sizex/4 or a.sizey/4
+local ox,oy
+local basepos_mult=.2
+if a.dir=="r"then
+ox=a.x+cos(angle)*arc_r*basepos_mult
+oy=a.y+sin(angle)*arc_r
+elseif a.dir=="l"then
+ox=a.x-cos(angle)*arc_r*basepos_mult
+oy=a.y+sin(angle)*arc_r
+elseif a.dir=="d"then
+ox=a.x+sin(angle)*arc_r
+oy=a.y+cos(angle)*arc_r*basepos_mult
+elseif a.dir=="u"then
+ox=a.x+sin(angle)*arc_r
+oy=a.y-cos(angle)*arc_r*basepos_mult
+end
+local mid=(a.dir=="l"or a.dir=="r") and .6 or .5
+local center=1-abs(t-mid)*2
+local reach=(0.5+center*0.5)*reach_mult
+local tsize=max(1,n/40)+center*3
+local spd=3+center*2
+local endx,endy=ox,oy
+local endpos_mult=.05
+if a.dir=="r"then
+endx=ox+cos(angle)*reach
+endy=oy+sin(angle)*reach*endpos_mult
+elseif a.dir=="l"then
+endx=ox-cos(angle)*reach
+endy=oy+sin(angle)*reach*endpos_mult
+elseif a.dir=="d"then
+endx=ox+sin(angle)*reach*endpos_mult
+endy=oy+cos(angle)*reach
+elseif a.dir=="u"then
+endx=ox+sin(angle)*reach*endpos_mult
+endy=oy-cos(angle)*reach
+end
+local p=circlep({
+x=ox,
+y=oy,
+c=7,
+size=1,
+upd=_noop,
+})
+chaintweens({
+{
+tween_factory(p,"size",tsize,spd,quint),
+tween_factory(p,"x",endx,spd,quint),
+tween_factory(p,"y",endy,spd,quint),
+},
+{
+tween_factory(p,"size",0,spd/1.5,smootherstep),
+}
+},function()
+del(global.parts,p)
+end)
+end
+end
+function enhurt(_ENV)
+n=20
+local c=142
+circlep({
+size=10,
+c=7,
+x=x,
+y=y,
+maxage=2
+})
+circlep({
+size=10,
+ctab={8,14},
+x=x,
+y=y,
+maxage=4
+})
+for i=1,n do
+circlep({
+size=rnd(3),
+c=231,
+x=x,
+y=y,
+sx=rnd(),
+sy=rnd(),
+wait=6,
+border=chance(.25),
+maxage=rndrange(3,4),
+onend="fade"
+})
+end
+end
+function enhit(_ENV)
+n=10
+circlep({
+size=10,
+c=7,
+x=x,
+y=y,
+wait=0,
+maxage=3
+})
+for i=1,n do
+circlep({
+size=rnd(3),
+c=c,
+x=x,
+y=y,
+sx=rnd(),
+sy=rnd(),
+wait=3,
+border=chance(.25),
+maxage=rndrange(10,15),
+onend="fade",
+})
+end
+end
+cd_bar=game_object:extend({
+barwidth=10,
+barheight=1,
+drw=function(_ENV)
+x=p.x
+y=p.y+9
+local progress=lerp(0,barwidth,mid(0,1-p.hit_t/p.hit_cd,1))
+local bx=x-barwidth/2
+line(bx,y,bx+barwidth,y,0)
+line(bx,y,bx+progress,y,7)
+end
+})
+dash_bar=game_object:extend({
+barwidth=6,
+barheight=1,
+drw=function(_ENV)
+if p.has_dash then
+x=p.x
+y=p.y+11
+local progress=lerp(0,barwidth,mid(0,1-p.dasht/p.dash_cd,1))
+local bx=x-barwidth/2
+line(bx,y,bx+barwidth,y,0)
+line(bx,y,bx+progress,y,12)
+end
+end
+})
+xp_bar=game_object:extend({
+barwidth=46,
+barheight=3,
+drw=function(_ENV)
+x=cam.x
+y=cam.y+50
+progress=lerp(0,barwidth-2,mid(0,p.xp/p.level_ups[min(p.level,#p.level_ups)],1))
+local bx=flr(x-barwidth/2)
+rectfill(bx,y,bx+barwidth,y+barheight,barc)
+rectfill(bx+1,y+1,bx+1+progress,y+barheight-1,12)
+print("\^o040LVL ",bx-12,y-1,barc)
+print("\^o040"..tostr(p.level),bx+barwidth+4,y-1,barc)
+end
+})
+hp_bar=game_object:extend({
+x=64,
+y=108,
+barwidth=60,
+barheight=3,
+drw=function(_ENV)
+x=cam.x
+y=cam.y+56
+progress=lerp(0,barwidth-2,p.hp/p.maxhp)
+local bx=flr(x-barwidth/2)
+rectfill(bx,y,bx+barwidth,y+barheight,barc)
+rectfill(bx+1,y+1,bx+barwidth-1,y+barheight-1,6)
+rectfill(bx+1,y+1,bx+progress+1,y+barheight-1,14)
+print("\^o040HP:",bx-12,y,barc)
+end
+})
+game_ui=game_object:extend({
+barc=15,
+bars={},
+init=function(_ENV)
+add(bars,xp_bar({barc=barc}))
+add(bars,hp_bar({barc=barc}))
+add(bars,cd_bar())
+add(bars,dash_bar())
+end,
+upd=function(_ENV)
+upd_group(bars)
+end,
+drw=function(_ENV)
+drw_group(bars)
+for oven in all(ovens) do
+oven:drw_indicator()
+end
+end,
+})
+upgrade_ui=game_object:extend({
+selected=1,
+init=function(_ENV)
+age=0
+buttons={}
+x=scene.cam.x;y=scene.cam.y
+global.paused=true
+for part in all(parts) do
+del(parts,part)
+end
+for tw in all(routines) do
+if tw.pausable then del(routines,tw) end
+end
+global.routines={}
+for i=1,#upgrades do
+add(buttons,upgrade_button({x=-64+32*i,y=-10,upgrade=upgrades[i],selected=i==1}))
+end
+sbutt=buttons[selected]
+end,
+upd=function(_ENV)
+age+=1
+if btnp(➡️) then
+sfx(8)
+selected+=1
+selected=selected>#buttons and 1 or selected
+end
+if btnp(⬅️) then
+sfx(8)
+selected-=1
+selected=selected<1 and#buttons or selected
+end
+sbutt=buttons[selected]
+for button in all(buttons) do
+button.selected=sbutt==button
+end
+if btnp(🅾️) or btnp(❎) then
+sfx(11)
+sbutt:trigger()
+upgrades={}
+buttons={}
+global.ui=game_ui
+global.paused=false
+end
+end,
+drw=function(_ENV)
+if age<70 then
+print("\^o040\^w\^t◆ lvl "..tostr(p.level).." ◆",x-42,y-50,
+sin(age/12)>-.85 and 7 or 15)
+end
+drw_group(buttons)
+rectfill(x-64,y+54,x+64,y+64,7)
+print(sbutt.upgrade.name,x-2*#sbutt.upgrade.name,y+57,0)
+end
+})
+upgrade_button=game_object:extend({
+x=0,
+y=0,
+bc=0,
+c=15,
+upgrade=nil,
+selected=false,
+init=function(_ENV)
+width=width or 24
+height=height or 24
+end,
+drw=function(_ENV)
+sx=cam.x+x
+sy=cam.y+y
+local bx=sx-width/2
+local by=sy-width/2
+if selected then
+rectfill(bx-1,by-1,bx+width+1,by+height+1,7)
+end
+rectfill(bx,by,bx+width,by+height,bc)
+rectfill(bx+1,by+1,bx+width-1,by+height-1,c)
+mspr(upgrade.icon,sx,sy)
+end,
+trigger=function(_ENV)
+upgrade:trigger()
+end
+})
+transition=game_object:extend({
+frames=30,
+cols=split"8, 8, 8, 8, 14, 14, 14, 4, 4 ",
+n=16,
+spd=.3,
+current_size=0,
+fsize=8,
+shrink=false,
+trans=smootherstep,
+init=function(_ENV)
+sfx(0)
+circles={}
+global.trans=_ENV
+for i=1,n do
+for j=1,n do
+local circle={x=(i-1)*128/(n-1),y=(j-1)*128/(n-1),r=0,c=rnd(cols)}
+add(circles,circle)
+local wait=rnd(15)
+chaintweens({
+tween_factory(circle,"r",rndrange(4,8),frames-wait,trans),
+tween_wait(wait,function()
+global.scene:load(new_scene)
+end),
+{
+tween_factory(circle,"r",0,frames,trans),
+}
+},function() global.trans=nil end,false)
+end
+end
+shuffle(circles)
+end,
+drw=function(_ENV)
+for circle in all(circles) do
+local r=circle.r
+local x=peek2(0x5f28)+circle.x
+local y=peek2(0x5f2a)+circle.y
+if r>2 then
+circfill(x,y,r+1,2)
+end
+circfill(x,y,r,circle.c)
+end
+end
+})
+function story_init(_ENV)
+pressed=false
+load_stored_gfx(story_gfx)
+_upd=story_upd
+_drw=story_drw
+x,y=startpx,startpx-64
+mapx,mapy=rndrange(0,6),0
+local xsep=28
+images={
+{s=myspr[54],x=x-4,y=y-24,tx=x-xsep,ty=y-59},
+{s=myspr[55],x=x-2,y=y-22,tx=x+xsep,ty=y-59},
+{s=myspr[56],x=x,y=y-20,tx=x-xsep,ty=y-22},
+{s=myspr[57],x=x+2,y=y-18,tx=x+xsep,ty=y-22},
+{s=myspr[58],x=x+4,y=y-16,tx=x,ty=y+14}
+}
+frames=60
+imgi=1
+texts=split2d"\n❎/🅾️ to continue|looks like our poor,friendly baker is getting fired!|i guess she's got,nothing to loose now...|she decides to,bake one last batch...|she hears ominous sounds,coming from the oven...|the bread is alive!,and it is not friendly..."
+end
+function story_upd(_ENV)
+if imgi>#images then
+if(btnp(🅾️) or btnp(❎)) and not pressed then
+pressed=true
+transition({new_scene=game})
+end
+else
+if btnp(🅾️) or btnp(❎) then
+sfx(47)
+dotween(images[imgi],"x",images[imgi].tx,frames,overshoot)
+dotween(images[imgi],"y",images[imgi].ty,frames,overshoot)
+imgi+=1
+end
+end
+end
+function story_drw(_ENV)
+cls(2)
+rectfill(x-64,y+34,x+128,y+128,c)
+local text=texts[imgi] or texts[#texts]
+for i=1,#text do
+print(text[i],x-#text[i]/2*4,y+29+i*7,15)
+end
+for i=1,#images do
+local img=images[#images+1-i]
+mspr(img.s,img.x,img.y)
+end
+end
+story=scene:extend({
+init=story_init,
+upd=story_upd,
+drw=story_drw,
+})
 __gfx__
 ccccc000000cccccccccc00000ccccccccccc00000cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 cccc07676760cccccccc0676760ccccccccc0676760ccccccccc000000cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc

@@ -1,10 +1,10 @@
-function bun_ai(_𝘦𝘯𝘷)
+function bun_ai(_ENV)
     if (p == nil) return nil
-    setdir(_𝘦𝘯𝘷, p)
-    local pdist = disto(_𝘦𝘯𝘷, p)
+    setdir(_ENV, p)
+    local pdist = disto(_ENV, p)
     local dist_thresh = 30
     if  pdist > dist_thresh and last_pdist < dist_thresh  and abs(rotation_dir) > .5 then
-        dotween(_𝘦𝘯𝘷, "rotation_dir", -sgn(rotation_dir), 90, quad)
+        dotween(_ENV, "rotation_dir", -sgn(rotation_dir), 90, quad)
     else
         local tangent_x = -dy * rotation_dir
         local tangent_y = dx * rotation_dir
@@ -18,9 +18,9 @@ function bun_ai(_𝘦𝘯𝘷)
     end
 end
 
-function bun_drw(_𝘦𝘯𝘷)
+function bun_drw(_ENV)
 	mspr(sprarr, x, y)
-	drwhp(_𝘦𝘯𝘷)
+	drwhp(_ENV)
 	for i=1, 2 do
 	    local oy = p.y > y and 3 or 2
 		local ox = p.x > x and -2 or -3
@@ -34,7 +34,7 @@ bun = enemy:extend({
 
     sprarr = myspr[29],
     drw = bun_drw,
-    enemy_init = function(_𝘦𝘯𝘷)
+    enemy_init = function(_ENV)
         hp = enstats[enstats_i][5][1]
         move_speed = enstats[enstats_i][5][2]
         orbit_speed = move_speed * 1.2

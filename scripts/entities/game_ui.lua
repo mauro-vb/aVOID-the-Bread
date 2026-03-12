@@ -1,7 +1,7 @@
 cd_bar = game_object:extend({
     barwidth = 10,
     barheight = 1,
-    drw = function(_𝘦𝘯𝘷)
+    drw = function(_ENV)
         x = p.x
         y = p.y + 9
 
@@ -15,7 +15,7 @@ cd_bar = game_object:extend({
 dash_bar = game_object:extend({
     barwidth = 6,
     barheight = 1,
-    drw = function(_𝘦𝘯𝘷)
+    drw = function(_ENV)
         if p.has_dash then
             x = p.x
             y = p.y + 11
@@ -31,7 +31,7 @@ dash_bar = game_object:extend({
 xp_bar = game_object:extend({
     barwidth = 46,
     barheight = 3,
-    drw = function(_𝘦𝘯𝘷)
+    drw = function(_ENV)
         x = cam.x
         y = cam.y + 50
         progress = lerp(0, barwidth - 2, mid(0, p.xp / p.level_ups[min(p.level, #p.level_ups)], 1))
@@ -48,7 +48,7 @@ hp_bar = game_object:extend({
     y = 108,
     barwidth = 60,
     barheight = 3,
-    drw = function(_𝘦𝘯𝘷)
+    drw = function(_ENV)
         x = cam.x
         y = cam.y + 56
         progress = lerp(0, barwidth - 2, p.hp / p.maxhp)
@@ -64,16 +64,16 @@ hp_bar = game_object:extend({
 game_ui = game_object:extend({
     barc = 15,
     bars = {},
-    init = function(_𝘦𝘯𝘷)
+    init = function(_ENV)
         add(bars, xp_bar({ barc = barc }))
         add(bars, hp_bar({ barc = barc }))
         add(bars, cd_bar())
         add(bars, dash_bar())
     end,
-    upd = function(_𝘦𝘯𝘷)
+    upd = function(_ENV)
         upd_group(bars)
     end,
-    drw = function(_𝘦𝘯𝘷)
+    drw = function(_ENV)
         drw_group(bars)
         for oven in all(ovens) do
             oven:drw_indicator()
